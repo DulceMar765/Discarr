@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\employee;
 use Illuminate\Http\Request;
+use App\Models\Employee;
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
 
 class EmployeeController extends Controller
 {
@@ -12,7 +14,8 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        //
+        $employees = Employee::all();
+        return view('employee.index', compact('employees'));
     }
 
     /**
@@ -20,7 +23,7 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        //
+        return view('employee.create');
     }
 
     /**
@@ -28,38 +31,69 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|unique:employees',
+            'phone'     => 'required|string|max:20',
+            'position'  => 'required|string|max:255',
+            'salary'    => 'required|numeric|min:0',
+            'hire_date' => 'required|date',
+            'address'   => 'nullable|string',
+            'status'    => 'boolean'
+        ]);
+
+        Employee::create($validated);
+
+        return redirect()->route('employee.index')
+            ->with('success', 'Empleado creado exitosamente.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(employee $employee)
+    public function show(Employee $employee)
     {
-        //
+        return view('employee.show', compact('employee'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(employee $employee)
+    public function edit(Employee $employee)
     {
-        //
+        return view('employee.edit', compact('employee'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, employee $employee)
+    public function update(Request $request, Employee $employee)
     {
-        //
+        $validated = $request->validate([
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|unique:employees,email,' . $employee->id,
+            'phone'     => 'required|string|max:20',
+            'position'  => 'required|string|max:255',
+            'salary'    => 'required|numeric|min:0',
+            'hire_date' => 'required|date',
+            'address'   => 'nullable|string',
+            'status'    => 'boolean'
+        ]);
+
+        $employee->update($validated);
+
+        return redirect()->route('employee.index')
+            ->with('success', 'Empleado actualizado exitosamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(employee $employee)
+    public function destroy(Employee $employee)
     {
-        //
+        $employee->delete();
+
+        return redirect()->route('employee.index')
+            ->with('success', 'Empleado eliminado exitosamente.');
     }
 }
