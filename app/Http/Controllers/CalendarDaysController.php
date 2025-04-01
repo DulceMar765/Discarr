@@ -7,59 +7,56 @@ use Illuminate\Http\Request;
 
 class CalendarDaysController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Mostrar todos los días del calendario
     public function index()
     {
-        //
+        $days = CalendarDay::all();
+        return view('calendar.index', compact('days'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Crear un nuevo día en el calendario
     public function create()
     {
-        //
+        return view('calendar.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Almacenar un nuevo día
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'date' => 'required|date',
+            'total_slots' => 'nullable|integer',
+        ]);
+
+        CalendarDay::create($request->all());
+        return redirect()->route('calendar.index')->with('success', 'Día agregado exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(calendar_days $calendar_days)
+    // Editar un día existente
+    public function edit($id)
     {
-        //
+        $day = CalendarDay::findOrFail($id);
+        return view('calendar.edit', compact('day'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(calendar_days $calendar_days)
+    // Actualizar un día existente
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'date' => 'required|date',
+            'total_slots' => 'nullable|integer',
+        ]);
+
+        $day = CalendarDay::findOrFail($id);
+        $day->update($request->all());
+        return redirect()->route('calendar.index')->with('success', 'Día actualizado exitosamente.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, calendar_days $calendar_days)
+    // Eliminar un día
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(calendar_days $calendar_days)
-    {
-        //
+        $day = CalendarDay::findOrFail($id);
+        $day->delete();
+        return redirect()->route('calendar.index')->with('success', 'Día eliminado exitosamente.');
     }
 }
