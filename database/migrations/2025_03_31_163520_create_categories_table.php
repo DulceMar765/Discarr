@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->unique(); // Nombre único de la categoría (Ej: Metales, Maderas, Plásticos)
+            $table->text('description')->nullable(); // Breve descripción de la categoría
             $table->timestamps();
         });
     }

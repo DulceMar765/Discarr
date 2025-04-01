@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->unique();
+            $table->text('description')->nullable();
+            $table->foreignId('category_id')->constrained()->onDelete('cascade'); // Relación con categorías
+            $table->foreignId('supplier_id')->constrained()->onDelete('cascade'); // Relación con proveedores
+            $table->integer('stock')->default(0);
+            $table->decimal('price', 10, 2)->default(0.00);
+            $table->enum('priority', ['High', 'Medium', 'Low'])->default('Medium');
             $table->timestamps();
         });
     }
