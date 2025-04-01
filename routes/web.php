@@ -17,3 +17,5 @@ Route::get('/nosotros', function () {
 Route::get('/contacto', function () {
     return view('contacto.index');
 })->name('contacto');
+
+Route::resource('appointments', App\Http\Controllers\AppointmentsController::class);
