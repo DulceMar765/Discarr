@@ -12,7 +12,6 @@ class calendar_days extends Model
     protected $fillable = [
         'date',
         'availability_status',
-        'manual_override',
         'booked_slots',
         'total_slots',
     ];

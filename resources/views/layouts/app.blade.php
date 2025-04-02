@@ -4,84 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discarr - Remolques y Carrocerías</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
+
     <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <style>
         :root {
             --primary-color: #FF8C00;
             --secondary-color: #006666;
             --dark-bg: #121212;
         }
-        
+
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--dark-bg);
             color: #fff;
         }
-        
+
         .navbar {
             background-color: rgba(18, 18, 18, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .navbar-brand {
             color: var(--primary-color);
             font-weight: 700;
         }
-        
+
         .nav-link {
             color: #fff;
             transition: color 0.3s ease;
         }
-        
+
         .nav-link:hover {
             color: var(--primary-color);
         }
-        
+
         .navbar-toggler {
             border-color: rgba(255, 255, 255, 0.1);
         }
-        
+
         .footer {
             background-color: rgba(18, 18, 18, 0.95);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 2rem 0;
             margin-top: 3rem;
         }
-        
+
         .footer-links a {
             color: #fff;
             text-decoration: none;
             transition: color 0.3s ease;
         }
-        
+
         .footer-links a:hover {
             color: var(--primary-color);
         }
-        
+
         .social-links a {
             color: #fff;
             margin: 0 10px;
             font-size: 1.5rem;
             transition: color 0.3s ease;
         }
-        
+
         .social-links a:hover {
             color: var(--primary-color);
         }
-        
+
         .hero {
             background: linear-gradient(rgba(0, 102, 102, 0.7), rgba(255, 140, 0, 0.3)), url('/img/hero/hero-banner.jpg') no-repeat center center;
             background-size: cover;
@@ -203,8 +209,8 @@
                     <h5 class="text-primary mb-3">Contacto</h5>
                     <p class="mb-2">
                         <i class="fas fa-map-marker-alt me-2"></i>
-                        <a href="https://maps.google.com/?q=Altamira+1005,+Monte+Alto,+89606+Miramar,+Tamaulipas" 
-                           target="_blank" 
+                        <a href="https://maps.google.com/?q=Altamira+1005,+Monte+Alto,+89606+Miramar,+Tamaulipas"
+                           target="_blank"
                            class="text-decoration-none text-white">
                             Altamira 1005, Monte Alto, 89606 Miramar, Tamps.
                         </a>
@@ -246,7 +252,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Scripts -->
     @stack('scripts')
 </body>

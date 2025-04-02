@@ -22,8 +22,8 @@
 
         {{-- Selección del día del calendario --}}
         <div class="mb-3">
-            <label for="calendar_day_id" class="form-label">Día del Calendario</label>
-            <input type="date" name="calendar_day_id" id="calendar_day_id" class="form-control" required>
+            <label for="calendar_day" class="form-label">Día del Calendario</label>
+            <input type="text" id="calendar_day" name="calendar_day" class="form-control" placeholder="Selecciona un día" required>
         </div>
 
         {{-- Selección de la hora --}}
@@ -39,4 +39,40 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarDays = @json($calendarDays);
+        const preselectedDate = @json($preselectedDate);
+
+        // Mapea las fechas y sus colores
+        const dateColors = calendarDays.reduce((acc, day) => {
+            acc[day.date] = day.availability_status; // Mapea la fecha con su estado
+            return acc;
+        }, {});
+
+        // Inicializa Flatpickr
+        flatpickr("#calendar_day", {
+            dateFormat: "Y-m-d",
+            defaultDate: preselectedDate || null, // Establece la fecha preseleccionada (si existe)
+            enable: calendarDays.map(day => day.date), // Solo habilita las fechas disponibles
+            onDayCreate: function (dObj, dStr, fp, dayElem) {
+                const date = dayElem.dateObj.toISOString().split('T')[0]; // Obtiene la fecha en formato YYYY-MM-DD
+                const status = dateColors[date];
+
+                // Aplica colores según el estado
+                if (status === 'green') {
+                    dayElem.style.backgroundColor = 'green';
+                    dayElem.style.color = 'white';
+                } else if (status === 'yellow') {
+                    dayElem.style.backgroundColor = 'yellow';
+                    dayElem.style.color = 'black';
+                } else if (status === 'red') {
+                    dayElem.style.backgroundColor = 'red';
+                    dayElem.style.color = 'white';
+                }
+            }
+        });
+    });
+</script>
 @endsection
