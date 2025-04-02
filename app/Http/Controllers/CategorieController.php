@@ -14,16 +14,17 @@ class CategorieController extends Controller
     {
         // Devuelve una vista con la lista de todas las categorías
         $categories = Categorie::all();
-        return view('categories.index', compact('categories'));
+        return view('admin.categorie.index', compact('categories'));
     }
-
+    
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
         // Muestra el formulario para crear una nueva categoría
-        return view('categories.create');
+        return view('admin.categorie.create');
+
     }
 
     /**
@@ -44,7 +45,7 @@ class CategorieController extends Controller
         ]);
 
         // Redirige a la lista de categorías con un mensaje de éxito
-        return redirect()->route('categories.index')->with('success', 'Categoría creada exitosamente.');
+        return redirect()->route('categorie.index')->with('success', 'Categoría creada exitosamente.');
     }
 
     /**
@@ -53,7 +54,7 @@ class CategorieController extends Controller
     public function show(Categorie $categorie)
     {
         // Muestra los detalles de la categoría
-        return view('categories.show', compact('categorie'));
+        return view('categorie.show', compact('categorie'));
     }
 
     /**
@@ -62,7 +63,7 @@ class CategorieController extends Controller
     public function edit(Categorie $categorie)
     {
         // Muestra el formulario para editar una categoría
-        return view('categories.edit', compact('categorie'));
+        return view('categorie.edit', compact('categorie'));
     }
 
     /**
@@ -83,7 +84,7 @@ class CategorieController extends Controller
         ]);
 
         // Redirige a la lista de categorías con un mensaje de éxito
-        return redirect()->route('categories.index')->with('success', 'Categoría actualizada exitosamente.');
+        return redirect()->route('categorie.index')->with('success', 'Categoría actualizada exitosamente.');
     }
 
     /**
@@ -95,6 +96,6 @@ class CategorieController extends Controller
         $categorie->delete();
 
         // Redirige a la lista de categorías con un mensaje de éxito
-        return redirect()->route('categories.index')->with('success', 'Categoría eliminada exitosamente.');
+        return redirect()->route('categorie.index')->with('success', 'Categoría eliminada exitosamente.');
     }
 }

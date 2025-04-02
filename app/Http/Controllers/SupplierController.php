@@ -18,7 +18,7 @@ class SupplierController extends Controller
         {
             // Obtiene todos los proveedores y los pasa a la vista
             $suppliers = Supplier::all();
-            return view('suppliers.index', compact('suppliers'));
+            return view('admin.supplier.index', compact('suppliers'));
         }
     
         /**
@@ -27,7 +27,7 @@ class SupplierController extends Controller
         public function create()
         {
             // Muestra el formulario para crear un proveedor
-            return view('suppliers.create');
+            return view('admin.supplier.create');
         }
     
         /**
@@ -68,7 +68,7 @@ class SupplierController extends Controller
         public function edit(Supplier $supplier)
         {
             // Muestra el formulario de edición del proveedor
-            return view('suppliers.edit', compact('supplier'));
+            return view('admin.supplier.edit', compact('supplier'));
         }
     
         /**
