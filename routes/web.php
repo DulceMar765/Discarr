@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\AppointmentsController;
+use App\Http\Controllers\CalendarDaysController;
 
 
 Route::get('/', function () {
@@ -41,4 +43,7 @@ Route::resource('supplier', App\Http\Controllers\SupplierController::class);
 
 Route::resource('employee', EmployeeController::class);
 
-Route::resource('appointments', App\Http\Controllers\AppointmentsController::class);  
+Route::get('/appointments', [AppointmentsController::class, 'index'])->name('appointments.index');
+Route::get('/appointments/create', [AppointmentsController::class, 'create'])->name('appointments.create');
+Route::post('/appointments', [AppointmentsController::class, 'store'])->name('appointments.store');
+Route::delete('/appointments/{id}', [AppointmentsController::class, 'destroy'])->name('appointments.destroy');

@@ -9,39 +9,22 @@ class appointments extends Model
 {
     use HasFactory;
 
-    /**
-     * La tabla asociada al modelo.
-     *
-     * @var string
-     */
-    protected $table = 'appointments';
-
-    /**
-     * Los atributos que se pueden asignar de forma masiva.
-     *
-     * @var array
-     */
     protected $fillable = [
         'user_id',
         'calendar_day_id',
         'time_slot',
+        'status',
     ];
 
-    /**
-     * Relación con el modelo `CalendarDay`.
-     * Un appointment pertenece a un día del calendario.
-     */
-    public function calendarDay()
-    {
-        return $this->belongsTo(CalendarDay::class, 'calendar_day_id');
-    }
-
-    /**
-     * Relación con el modelo `User`.
-     * Un appointment pertenece a un usuario.
-     */
+    // Relación con el modelo User
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
+    }
+
+    // Relación con el modelo CalendarDays
+    public function calendarDay()
+    {
+        return $this->belongsTo(calendar_days::class);
     }
 }

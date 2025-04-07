@@ -20,19 +20,26 @@ class AppointmentsController extends Controller
     // Crear una nueva cita
     public function create(Request $request)
     {
-        // Obtén los días del calendario con su estado de disponibilidad
+        // Obtén los días del calendario existentes en la base de datos
         $calendarDays = calendar_days::select('id', 'date', 'availability_status')->get();
 
-        // Si no hay registros, genera los próximos 60 días como disponibles
-        if ($calendarDays->isEmpty()) {
-            $calendarDays = collect();
-            for ($i = 0; $i < 60; $i++) {
-                $calendarDays->push([
-                    'date' => now()->addDays($i)->format('Y-m-d'), // Genera la fecha
-                    'availability_status' => 'green', // Por defecto, todos los días están disponibles
-                ]);
+        // Genera los próximos 60 días si faltan días en la base de datos
+        for ($i = 0; $i < 60; $i++) {
+            $date = now()->addDays($i)->format('Y-m-d');
+            if (!$calendarDays->contains('date', $date)) {
+                calendar_days::updateOrCreate(
+                    ['date' => $date], // Condición para evitar duplicados
+                    [
+                        'availability_status' => 'green', // Por defecto, todos los días están disponibles
+                        'booked_slots' => 0,
+                        'total_slots' => 10, // Por ejemplo, 10 citas disponibles por día
+                    ]
+                );
             }
         }
+
+        // Vuelve a cargar los días del calendario después de generar los faltantes
+        $calendarDays = calendar_days::select('id', 'date', 'availability_status')->get();
 
         // Obtén la fecha preseleccionada (si existe)
         $preselectedDate = $request->input('date', null);
@@ -42,17 +49,16 @@ class AppointmentsController extends Controller
     }
 
     // Almacenar una nueva cita
-
     public function store(Request $request)
     {
-    // Validar los datos del formulario
-    $request->validate([
-        'calendar_day' => 'required|date', // Validar que sea una fecha válida
-        'time_slot' => 'required|date_format:H:i', // Validar que sea una hora válida
-    ]);
+        // Validar los datos del formulario
+        $request->validate([
+            'calendar_day' => 'required|date', // Validar que sea una fecha válida
+            'time_slot' => 'required|date_format:H:i', // Validar que sea una hora válida
+        ]);
 
-    // Buscar el ID del día del calendario basado en la fecha seleccionada
-    $calendarDay = calendar_days::where('date', $request->calendar_day)->first();
+        // Buscar el día del calendario basado en la fecha seleccionada
+        $calendarDay = calendar_days::where('date', $request->calendar_day)->first();
 
         if (!$calendarDay) {
             // Si el día no existe, crearlo como disponible
@@ -66,8 +72,10 @@ class AppointmentsController extends Controller
 
         // Crear la cita
         appointments::create([
+            'user_id' => Auth::id(), // ID del usuario autenticado
             'calendar_day_id' => $calendarDay->id,
             'time_slot' => $request->time_slot,
+            'status' => 'pending', // Estado inicial de la cita
         ]);
 
         // Actualizar el estado del día del calendario
