@@ -16,6 +16,7 @@ class Kernel extends HttpKernel
     protected $middleware = [
         // Middleware globales
         \App\Http\Middleware\TrustProxies::class,
+
         \Fruitcake\Cors\HandleCors::class,
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
@@ -62,5 +63,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class, // Agregar aquí el middleware de admin
+        'role' => \App\Http\Middleware\RoleMiddleware::class, // Middleware para roles
     ];
 }

@@ -26,7 +26,7 @@ Route::get('/contacto', function () {
 })->name('contacto');
 
 // Rutas generales
-Route::resource('categories', CategorieController::class);
+Route::resource('categories', CategoryController::class);
 Route::resource('supplier', SupplierController::class);
 Route::resource('employee', EmployeeController::class);
 
