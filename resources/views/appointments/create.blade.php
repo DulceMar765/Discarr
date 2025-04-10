@@ -1,4 +1,3 @@
-{{-- filepath: c:\Users\onlyc\WebDev_Project\Discarr\resources\views\appointments\create.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
@@ -25,11 +24,17 @@
             <label for="calendar_day" class="form-label">Día del Calendario</label>
             <input type="text" id="calendar_day" name="calendar_day" class="form-control" placeholder="Selecciona un día" required>
         </div>
-
         {{-- Selección de la hora --}}
         <div class="mb-3">
             <label for="time_slot" class="form-label">Hora</label>
-            <input type="time" name="time_slot" id="time_slot" class="form-control" placeholder="HH:mm" required>
+            <input type="time" id="time_slot" name="time_slot" class="form-control" min="09:00" max="16:00" step="3600" required>
+            <small class="form-text text-muted">Selecciona una hora entre las 09:00 y las 16:00.</small>
+        </div>
+
+        {{-- Descripción del trabajo --}}
+        <div class="mb-3">
+            <label for="description" class="form-label">Descripción del Trabajo:</label>
+            <textarea name="description" id="description" class="form-control" rows="4" placeholder="Describe el trabajo o la razón de la cita"></textarea>
         </div>
 
         {{-- Botones de acción --}}
@@ -42,8 +47,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const calendarDays = @json($calendarDays);
-        const preselectedDate = @json($preselectedDate);
+        const calendarDays = @json($calendarDays); // Días del calendario pasados desde el controlador
+        const preselectedDate = @json($preselectedDate); // Fecha preseleccionada (si existe)
+        const timeSlotSelect = document.getElementById('time_slot'); // Input de hora
 
         // Mapea las fechas y sus colores
         const dateColors = calendarDays.reduce((acc, day) => {
@@ -51,10 +57,17 @@
             return acc;
         }, {});
 
+        // Mapea las fechas y sus horarios disponibles
+        const dateToSlots = calendarDays.reduce((acc, day) => {
+            acc[day.date] = day.available_slots || []; // Asegúrate de que los slots estén disponibles
+            return acc;
+        }, {});
+
         // Inicializa Flatpickr
         flatpickr("#calendar_day", {
             dateFormat: "Y-m-d",
             defaultDate: preselectedDate || null, // Establece la fecha preseleccionada (si existe)
+            minDate: "today", // No permite seleccionar fechas anteriores a hoy
             enable: calendarDays.map(day => day.date), // Solo habilita las fechas disponibles
             onDayCreate: function (dObj, dStr, fp, dayElem) {
                 const date = dayElem.dateObj.toISOString().split('T')[0]; // Obtiene la fecha en formato YYYY-MM-DD
@@ -71,6 +84,21 @@
                     dayElem.style.backgroundColor = 'red';
                     dayElem.style.color = 'white';
                 }
+            },
+            onChange: function (selectedDates, dateStr, instance) {
+                // Actualiza los horarios disponibles cuando se selecciona una fecha
+                const availableSlots = dateToSlots[dateStr] || [];
+
+                // Limpia los horarios anteriores
+                timeSlotSelect.innerHTML = '<option value="">Selecciona un horario</option>';
+
+                // Agrega los horarios disponibles
+                availableSlots.forEach(slot => {
+                    const option = document.createElement('option');
+                    option.value = slot;
+                    option.textContent = slot;
+                    timeSlotSelect.appendChild(option);
+                });
             }
         });
     });

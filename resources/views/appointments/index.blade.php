@@ -1,4 +1,3 @@
-{{-- filepath: c:\Users\onlyc\WebDev_Project\Discarr\resources\views\appointments\index.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
@@ -19,6 +18,7 @@
                     <th>Usuario</th>
                     <th>Día del Calendario</th>
                     <th>Hora</th>
+                    <th>Descripción</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -26,9 +26,10 @@
                 @forelse ($appointments as $appointment)
                     <tr>
                         <td>{{ $appointment->id }}</td>
-                        <td>{{ $appointment->user_id }}</td>
-                        <td>{{ $appointment->calendar_day_id }}</td>
+                        <td>{{ $appointment->user->name }}</td> {{-- Relación con el usuario --}}
+                        <td>{{ $appointment->calendarDay->date }}</td> {{-- Relación con el día del calendario --}}
                         <td>{{ $appointment->time_slot }}</td>
+                        <td>{{ $appointment->description }}</td>
                         <td>
                             <a href="{{ route('appointments.edit', $appointment->id) }}" class="btn btn-primary btn-sm">Editar</a>
                             <form action="{{ route('appointments.destroy', $appointment->id) }}" method="POST" class="d-inline">
@@ -40,7 +41,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center">No hay citas registradas.</td>
+                        <td colspan="6" class="text-center">No hay citas registradas.</td>
                     </tr>
                 @endforelse
             </tbody>

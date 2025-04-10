@@ -15,9 +15,21 @@ class CalendarDaysController extends Controller
     }
 
     // Crear un nuevo día en el calendario
-    public function create()
+    public function create(Request $request)
     {
-        return view('calendar.create');
+        // Obtén los días del calendario con sus citas
+        $calendarDays = calendar_days::with('appointments')->get();
+    
+        // Agrega los horarios disponibles a cada día
+        $calendarDays->each(function ($day) {
+            $day->available_slots = $day->available_slots; // Usa el método del modelo para calcular los horarios disponibles
+        });
+    
+        // Obtén la fecha preseleccionada (si existe)
+        $preselectedDate = $request->input('date', null);
+    
+        // Retorna la vista con los días del calendario y la fecha preseleccionada
+        return view('appointments.create', compact('calendarDays', 'preselectedDate'));
     }
 
     // Almacenar un nuevo día
@@ -59,4 +71,5 @@ class CalendarDaysController extends Controller
         $day->delete();
         return redirect()->route('calendar.index')->with('success', 'Día eliminado exitosamente.');
     }
+
 }
