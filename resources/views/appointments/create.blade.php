@@ -1,4 +1,3 @@
-{{-- filepath: c:\Users\onlyc\WebDev_Project\Discarr\resources\views\appointments\create.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
@@ -30,6 +29,12 @@
         <div class="mb-3">
             <label for="time_slot" class="form-label">Hora</label>
             <input type="time" name="time_slot" id="time_slot" class="form-control" placeholder="HH:mm" required>
+        </div>
+
+        {{-- Descripción del trabajo --}}
+        <div class="mb-3">
+            <label for="description" class="form-label">Descripción del Trabajo:</label>
+            <textarea name="description" id="description" class="form-control" rows="4" placeholder="Describe el trabajo o la razón de la cita"></textarea>
         </div>
 
         {{-- Botones de acción --}}

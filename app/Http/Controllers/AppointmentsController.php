@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\appointments;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\calendar_days;
+use App\Models\calendar_days; // Corregido: Se usa calendar_days en lugar de CalendarDay
 
 class AppointmentsController extends Controller
 {
@@ -55,6 +55,7 @@ class AppointmentsController extends Controller
         $request->validate([
             'calendar_day' => 'required|date', // Validar que sea una fecha válida
             'time_slot' => 'required|date_format:H:i', // Validar que sea una hora válida
+            'description' => 'nullable|string|max:1000', // Validar la descripción (opcional)
         ]);
 
         // Buscar el día del calendario basado en la fecha seleccionada
@@ -75,6 +76,7 @@ class AppointmentsController extends Controller
             'user_id' => Auth::id(), // ID del usuario autenticado
             'calendar_day_id' => $calendarDay->id,
             'time_slot' => $request->time_slot,
+            'description' => $request->description, // Guardar la descripción
             'status' => 'pending', // Estado inicial de la cita
         ]);
 
@@ -102,10 +104,35 @@ class AppointmentsController extends Controller
         return redirect()->route('appointments.index')->with('success', 'Cita eliminada exitosamente.');
     }
 
+    public function edit($id)
+    {
+        $appointment = appointments::findOrFail($id); // Corregido: Se usa appointments en lugar de Appointment
+        $calendarDays = calendar_days::all(); // Corregido: Se usa calendar_days en lugar de CalendarDay
+        return view('appointments.edit', compact('appointment', 'calendarDays'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'calendar_day_id' => 'required|exists:calendar_days,id',
+            'time_slot' => 'required',
+            'description' => 'nullable|string|max:1000', // Validar la descripción (opcional)
+        ]);
+
+        $appointment = appointments::findOrFail($id); // Corregido: Se usa appointments en lugar de Appointment
+        $appointment->update([
+            'calendar_day_id' => $request->calendar_day_id,
+            'time_slot' => $request->time_slot,
+            'description' => $request->description, // Actualizar la descripción
+        ]);
+
+        return redirect()->route('appointments.index')->with('success', 'Cita actualizada correctamente.');
+    }
+
     // Método para actualizar booked_slots
     private function updateBookedSlots($calendarDayId)
     {
-        $calendarDay = calendar_days::findOrFail($calendarDayId);
+        $calendarDay = calendar_days::findOrFail($calendarDayId); // Corregido: Se usa calendar_days en lugar de CalendarDay
         $calendarDay->booked_slots = appointments::where('calendar_day_id', $calendarDayId)->count();
         $calendarDay->availability_status = $this->calculateAvailabilityStatus($calendarDay);
         $calendarDay->save();

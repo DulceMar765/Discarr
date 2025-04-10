@@ -14,17 +14,18 @@ class appointments extends Model
         'calendar_day_id',
         'time_slot',
         'status',
+        'description',
     ];
 
     // Relación con el modelo User
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relación con el modelo CalendarDays
     public function calendarDay()
     {
-        return $this->belongsTo(calendar_days::class);
+        return $this->belongsTo(calendar_days::class, 'calendar_day_id');
     }
 }

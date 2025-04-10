@@ -39,4 +39,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/appointments/create', [AppointmentsController::class, 'create'])->name('appointments.create');
     Route::post('/appointments', [AppointmentsController::class, 'store'])->name('appointments.store');
     Route::delete('/appointments/{id}', [AppointmentsController::class, 'destroy'])->name('appointments.destroy');
+    Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
+    Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
 });
