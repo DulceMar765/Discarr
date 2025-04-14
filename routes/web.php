@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\CalendarDaysController;
+use App\Http\Controllers\ProjectCostController;
 
 // Página de inicio
 Route::get('/', function () {
@@ -24,6 +26,11 @@ Route::get('/nosotros', function () {
 Route::get('/contacto', function () {
     return view('contacto.index');
 })->name('contacto');
+
+//costes de proyecto
+Route::resource('projects.costs', ProjectCostController::class)
+    ->except(['show'])
+    ->parameters(['costs' => 'projectCost']);
 
 // Rutas generales
 Route::resource('categories', CategoryController::class);

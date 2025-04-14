@@ -37,6 +37,12 @@
             <textarea name="description" id="description" class="form-control" rows="4" placeholder="Describe el trabajo o la razón de la cita"></textarea>
         </div>
 
+        {{-- Descripción del trabajo --}}
+        <div class="mb-3">
+            <label for="description" class="form-label">Descripción del Trabajo:</label>
+            <textarea name="description" id="description" class="form-control" rows="4" placeholder="Describe el trabajo o la razón de la cita"></textarea>
+        </div>
+
         {{-- Botones de acción --}}
         <div class="d-flex justify-content-between">
             <a href="{{ route('appointments.index') }}" class="btn btn-secondary">Volver a la Lista</a>
