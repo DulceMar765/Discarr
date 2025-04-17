@@ -70,18 +70,25 @@
             minDate: "today", // No permite seleccionar fechas anteriores a hoy
             enable: calendarDays.map(day => day.date), // Solo habilita las fechas disponibles
             onDayCreate: function (dObj, dStr, fp, dayElem) {
-                const date = dayElem.dateObj.toISOString().split('T')[0]; // Obtiene la fecha en formato YYYY-MM-DD
-                const status = dateColors[date];
+    const date = dayElem.dateObj.toISOString().split('T')[0]; // Obtiene la fecha en formato YYYY-MM-DD
+    const status = dateColors[date];
 
-                // Aplica colores según el estado
+    // Aplica colores según el estado
                 if (status === 'green') {
-                    dayElem.style.backgroundColor = 'green';
+                dayElem.style.backgroundColor = 'green';
                     dayElem.style.color = 'white';
                 } else if (status === 'yellow') {
                     dayElem.style.backgroundColor = 'yellow';
                     dayElem.style.color = 'black';
+                } else if (status === 'orange') {
+                    dayElem.style.backgroundColor = 'orange'; // Cambia el color a naranja
+                    dayElem.style.color = 'white';
                 } else if (status === 'red') {
                     dayElem.style.backgroundColor = 'red';
+                    dayElem.style.color = 'white';
+                } else {
+                    // Si no hay estado definido, aplica un color por defecto
+                    dayElem.style.backgroundColor = 'gray';
                     dayElem.style.color = 'white';
                 }
             },

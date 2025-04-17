@@ -20,6 +20,9 @@ class AppointmentsController extends Controller
     // Crear una nueva cita
     public function create(Request $request)
     {
+        // Elimina los días pasados
+        $this->deletePastDays();
+
         // Genera los próximos 60 días si faltan días en la base de datos
         for ($i = 0; $i < 60; $i++) {
             $date = now()->addDays($i)->format('Y-m-d');
@@ -34,12 +37,14 @@ class AppointmentsController extends Controller
         }
 
         // Obtén los días del calendario con sus citas
-        $calendarDays = calendar_days::with('appointments')->get();
+        $calendarDays = calendar_days::all();
 
-        // Agrega los horarios disponibles a cada día
-        $calendarDays->each(function ($day) {
-            $day->available_slots = $day->available_slots; // Usa el método del modelo para calcular los horarios disponibles
-        });
+        // Actualiza los `booked_slots` y el `availability_status` de cada día
+        foreach ($calendarDays as $calendarDay) {
+            $calendarDay->booked_slots = appointments::where('calendar_day_id', $calendarDay->id)->count();
+            $calendarDay->availability_status = $this->calculateAvailabilityStatus($calendarDay);
+            $calendarDay->save();
+        }
 
         // Obtén la fecha preseleccionada (si existe)
         $preselectedDate = $request->input('date', null);
@@ -82,6 +87,9 @@ class AppointmentsController extends Controller
             'status' => 'pending', // Estado inicial de la cita
         ]);
 
+        // Actualizar todos los días del calendario
+        $this->updateAllCalendarDays();
+
         return redirect()->route('appointments.index')->with('success', 'Cita creada exitosamente.');
     }
 
@@ -89,11 +97,11 @@ class AppointmentsController extends Controller
     public function destroy($id)
     {
         $appointment = appointments::findOrFail($id);
-        $calendarDayId = $appointment->calendar_day_id;
         $appointment->delete();
 
-        // Actualizar booked_slots
-        $this->updateBookedSlots($calendarDayId);
+        // Actualizar todos los días del calendario
+        $this->updateAllCalendarDays();
+
         return redirect()->route('appointments.index')->with('success', 'Cita eliminada exitosamente.');
     }
 
@@ -148,4 +156,64 @@ class AppointmentsController extends Controller
             return 'red';
         }
     }
+
+    private function updateCalendarDay($calendarDay)
+    {
+        // Actualiza el número de slots reservados
+        $calendarDay->booked_slots = appointments::where('calendar_day_id', $calendarDay->id)->count();
+
+        // Si hay un override manual, no se cambia el estado automáticamente
+        if ($calendarDay->manual_override) {
+            return;
+        }
+
+        // Calcula el estado de disponibilidad
+        if ($calendarDay->booked_slots >= $calendarDay->total_slots) {
+            $calendarDay->availability_status = 'red'; // Día completamente ocupado
+        } elseif ($calendarDay->booked_slots >= $calendarDay->total_slots / 2) {
+            $calendarDay->availability_status = 'yellow'; // Día parcialmente ocupado
+        } else {
+            $calendarDay->availability_status = 'green'; // Día disponible
+        }
+
+        // Guarda los cambios
+        $calendarDay->save();
+    }
+
+    private function updateAllCalendarDays()
+    {
+        // Obtén todos los días del calendario
+        $calendarDays = calendar_days::all();
+
+        foreach ($calendarDays as $calendarDay) {
+            // Actualiza el número de slots reservados
+            $calendarDay->booked_slots = appointments::where('calendar_day_id', $calendarDay->id)->count();
+
+            // Si hay un override manual, no se cambia el estado automáticamente
+            if ($calendarDay->manual_override) {
+                continue;
+            }
+
+            // Calcula el estado de disponibilidad
+            if ($calendarDay->booked_slots >= $calendarDay->total_slots) {
+                $calendarDay->availability_status = 'red'; // Día completamente ocupado
+            } elseif ($calendarDay->booked_slots >= $calendarDay->total_slots / 2) {
+                $calendarDay->availability_status = 'yellow'; // Día parcialmente ocupado
+            } else {
+                $calendarDay->availability_status = 'green'; // Día disponible
+            }
+
+            // Guarda los cambios
+            $calendarDay->save();
+        }
+    }
+
+    public function deletePastDays()
+    {
+        // Elimina los días anteriores a la fecha actual
+        calendar_days::where('date', '<', now()->format('Y-m-d'))->delete();
+
+        return redirect()->route('appointments.index')->with('success', 'Días pasados eliminados correctamente.');
+    }
+
 }

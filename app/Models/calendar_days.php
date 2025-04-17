@@ -18,6 +18,7 @@ class calendar_days extends Model
         'availability_status',
         'booked_slots',
         'total_slots',
+        'manual_override',
     ];
 
     // Relación con las citas
