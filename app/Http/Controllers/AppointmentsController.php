@@ -157,29 +157,6 @@ class AppointmentsController extends Controller
         }
     }
 
-    private function updateCalendarDay($calendarDay)
-    {
-        // Actualiza el número de slots reservados
-        $calendarDay->booked_slots = appointments::where('calendar_day_id', $calendarDay->id)->count();
-
-        // Si hay un override manual, no se cambia el estado automáticamente
-        if ($calendarDay->manual_override) {
-            return;
-        }
-
-        // Calcula el estado de disponibilidad
-        if ($calendarDay->booked_slots >= $calendarDay->total_slots) {
-            $calendarDay->availability_status = 'red'; // Día completamente ocupado
-        } elseif ($calendarDay->booked_slots >= $calendarDay->total_slots / 2) {
-            $calendarDay->availability_status = 'yellow'; // Día parcialmente ocupado
-        } else {
-            $calendarDay->availability_status = 'green'; // Día disponible
-        }
-
-        // Guarda los cambios
-        $calendarDay->save();
-    }
-
     private function updateAllCalendarDays()
     {
         // Obtén todos los días del calendario
