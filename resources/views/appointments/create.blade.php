@@ -1,115 +1,123 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-5">
-    <h1 class="text-center mb-4 text-white">Crear Nueva Cita</h1>
-
-    {{-- Mensajes de error --}}
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-light border border-danger text-danger text-center mb-3" style="font-weight:bold;">
+                &gt;&gt; El periodo máximo para solicitar una cita es de 60 días naturales &lt;&lt;
+            </div>
         </div>
-    @endif
-
-    {{-- Formulario para crear una nueva cita --}}
-    <form method="POST" action="{{ route('appointments.store') }}" class="bg-dark text-white p-4 rounded">
+    </div>
+    <form method="POST" action="{{ route('appointments.store') }}" class="bg-dark text-white p-3 rounded">
         @csrf
-
-        {{-- Selección del día del calendario --}}
-        <div class="mb-3">
-            <label for="calendar_day" class="form-label">Día del Calendario</label>
-            <input type="text" id="calendar_day" name="calendar_day" class="form-control" placeholder="Selecciona un día" required>
-        </div>
-        {{-- Selección de la hora --}}
-        <div class="mb-3">
-    <label for="time_slot" class="form-label">Hora</label>
-    <select id="time_slot" name="time_slot" class="form-control" required>
-        <option value="">Selecciona un horario</option>
-        <!-- Las opciones se llenarán dinámicamente con JS -->
-    </select>
-    <small class="form-text text-muted">Selecciona una hora entre las 09:00 y las 16:00.</small>
-</div>
-
-        {{-- Descripción del trabajo --}}
-        <div class="mb-3">
-            <label for="description" class="form-label">Descripción del Trabajo:</label>
-            <textarea name="description" id="description" class="form-control" rows="4" placeholder="Describe el trabajo o la razón de la cita"></textarea>
-        </div>
-
-        {{-- Botones de acción --}}
-        <div class="d-flex justify-content-between">
-            <a href="{{ route('appointments.index') }}" class="btn btn-secondary">Volver a la Lista</a>
-            <button type="submit" class="btn btn-success">Reservar</button>
+        <div class="row">
+            <div class="col-md-7">
+                <label class="mb-1 fw-bold">Selecciona una fecha y hora:</label>
+                <div class="d-flex flex-row">
+                    <div style="min-width: 320px;">
+                        <div id="calendar" class="border rounded bg-white mb-2"></div>
+                    </div>
+                    <div class="ms-3">
+                        <table class="table table-bordered" style="font-size: 0.95rem;">
+                            <thead class="table-light"><tr><th colspan="2" class="text-center">Disponibilidad</th></tr></thead>
+                            <tbody>
+                            <tr><td style="background: #28a745; width: 32px;"></td><td>Alta disponibilidad</td></tr>
+                            <tr><td style="background: #ffc107;"></td><td>Poca disponibilidad</td></tr>
+                            <tr><td style="background: #dc3545;"></td><td>Sin disponibilidad</td></tr>
+                            <tr><td style="background: #b39ddb;"></td><td>Día sin servicio</td></tr>
+                            <tr><td style="background: #adb5bd;"></td><td>Día sin disponibilidad de cita</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <input type="hidden" id="calendar_day" name="calendar_day" required>
+                <div class="mb-3 mt-2">
+                    <label for="time_slot" class="form-label">Horarios disponibles:</label>
+                    <select id="time_slot" name="time_slot" class="form-control" required>
+                        <option value="">Selecciona un horario</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h5 class="mb-3 text-warning">Datos del solicitante</h5>
+                <div class="mb-2">
+                    <label class="form-label">Nombre completo</label>
+                    <input type="text" name="requester_name" class="form-control" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Correo electrónico</label>
+                    <input type="email" name="requester_email" class="form-control" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Teléfono</label>
+                    <input type="tel" name="requester_phone" class="form-control" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Motivo o descripción</label>
+                    <textarea name="description" class="form-control" rows="2" placeholder="Describe el motivo de la cita"></textarea>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Fecha seleccionada:</label>
+                    <input type="text" id="selected_date" class="form-control bg-secondary text-white" readonly>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Horario seleccionado:</label>
+                    <input type="text" id="selected_time" class="form-control bg-secondary text-white" readonly>
+                </div>
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="submit" class="btn btn-success">Reservar horario</button>
+                    <button type="reset" class="btn btn-secondary">Limpiar</button>
+                </div>
+            </div>
         </div>
     </form>
 </div>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const calendarDays = @json($calendarDays); // Días del calendario pasados desde el controlador
-        const preselectedDate = @json($preselectedDate); // Fecha preseleccionada (si existe)
-        const timeSlotSelect = document.getElementById('time_slot'); // Input de hora
-
-        // Mapea las fechas y sus colores
-        const dateColors = calendarDays.reduce((acc, day) => {
-            acc[day.date] = day.availability_status; // Mapea la fecha con su estado
-            return acc;
-        }, {});
-
-        // Mapea las fechas y sus horarios disponibles
-        const dateToSlots = calendarDays.reduce((acc, day) => {
-            acc[day.date] = day.available_slots || []; // Asegúrate de que los slots estén disponibles
-            return acc;
-        }, {});
-
-        // Inicializa Flatpickr
-        flatpickr("#calendar_day", {
+        const calendarDays = @json($calendarDays);
+        const preselectedDate = @json($preselectedDate);
+        const timeSlotSelect = document.getElementById('time_slot');
+        const calendarInput = document.getElementById('calendar_day');
+        const selectedDateInput = document.getElementById('selected_date');
+        const selectedTimeInput = document.getElementById('selected_time');
+        // Colores
+        const colorMap = { green: '#28a745', yellow: '#ffc107', orange: '#fd7e14', red: '#dc3545', purple: '#b39ddb', gray: '#adb5bd' };
+        const dateColors = calendarDays.reduce((acc, day) => { acc[day.date] = day.availability_status; return acc; }, {});
+        const dateToSlots = calendarDays.reduce((acc, day) => { acc[day.date] = day.available_slots || []; return acc; }, {});
+        flatpickr("#calendar", {
+            inline: true,
             dateFormat: "Y-m-d",
-            defaultDate: preselectedDate || null, // Establece la fecha preseleccionada (si existe)
-            minDate: "today", // No permite seleccionar fechas anteriores a hoy
-            enable: calendarDays.map(day => day.date), // Solo habilita las fechas disponibles
+            defaultDate: preselectedDate || null,
+            minDate: "today",
+            enable: calendarDays.map(day => day.date),
             onDayCreate: function (dObj, dStr, fp, dayElem) {
-    const date = dayElem.dateObj.toISOString().split('T')[0]; // Obtiene la fecha en formato YYYY-MM-DD
-    const status = dateColors[date];
-
-    // Aplica colores según el estado
-                if (status === 'green') {
-                dayElem.style.backgroundColor = 'green';
-                    dayElem.style.color = 'white';
-                } else if (status === 'yellow') {
-                    dayElem.style.backgroundColor = 'yellow';
-                    dayElem.style.color = 'black';
-                } else if (status === 'orange') {
-                    dayElem.style.backgroundColor = 'orange'; // Cambia el color a naranja
-                    dayElem.style.color = 'white';
-                } else if (status === 'red') {
-                    dayElem.style.backgroundColor = 'red';
-                    dayElem.style.color = 'white';
-                } else {
-                    // Si no hay estado definido, aplica un color por defecto
-                    dayElem.style.backgroundColor = 'gray';
-                    dayElem.style.color = 'white';
-                }
+                const date = dayElem.dateObj.toISOString().split('T')[0];
+                const status = dateColors[date];
+                if (status === 'green') { dayElem.style.backgroundColor = colorMap.green; dayElem.style.color = 'white'; }
+                else if (status === 'yellow') { dayElem.style.backgroundColor = colorMap.yellow; dayElem.style.color = 'black'; }
+                else if (status === 'orange') { dayElem.style.backgroundColor = colorMap.orange; dayElem.style.color = 'white'; }
+                else if (status === 'red') { dayElem.style.backgroundColor = colorMap.red; dayElem.style.color = 'white'; }
+                else if (status === 'purple') { dayElem.style.backgroundColor = colorMap.purple; dayElem.style.color = 'white'; }
+                else { dayElem.style.backgroundColor = colorMap.gray; dayElem.style.color = 'white'; }
             },
             onChange: function (selectedDates, dateStr, instance) {
-                // Actualiza los horarios disponibles cuando se selecciona una fecha
+                calendarInput.value = dateStr;
+                selectedDateInput.value = dateStr;
+                // Actualiza horarios
                 const availableSlots = dateToSlots[dateStr] || [];
-
-                // Limpia los horarios anteriores
                 timeSlotSelect.innerHTML = '<option value="">Selecciona un horario</option>';
-
-                // Agrega los horarios disponibles
                 availableSlots.forEach(slot => {
                     const option = document.createElement('option');
                     option.value = slot;
                     option.textContent = slot;
                     timeSlotSelect.appendChild(option);
                 });
+                selectedTimeInput.value = '';
             }
+        });
+        timeSlotSelect.addEventListener('change', function() {
+            selectedTimeInput.value = this.value;
         });
     });
 </script>

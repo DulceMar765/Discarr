@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
+use App\Models\Appointment; // Asegúrate que el archivo sea appointments.php pero la clase es singular
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CalendarDay; // Corregido: Se usa calendar_days en lugar de CalendarDay
@@ -36,21 +36,39 @@ class AppointmentsController extends Controller
             );
         }
 
-        // Obtén los días del calendario con sus citas
-        $calendarDays = CalendarDay::all();
-
-        // Actualiza los `booked_slots` y el `availability_status` de cada día
-        foreach ($calendarDays as $calendarDay) {
-            $calendarDay->booked_slots = Appointment::where('calendar_day_id', $calendarDay->id)->count();
-            $calendarDay->availability_status = $this->calculateAvailabilityStatus($calendarDay);
-            $calendarDay->save();
+        // Obtén los próximos 60 días naturales (no solo los existentes en la BD)
+        $calendarDays = collect();
+        for ($i = 0; $i < 60; $i++) {
+            $date = now()->addDays($i)->format('Y-m-d');
+            $calendarDay = CalendarDay::where('date', $date)->first();
+            if ($calendarDay) {
+                // Asegura que los datos estén actualizados y agrega los slots disponibles
+                $calendarDay->booked_slots = Appointment::where('calendar_day_id', $calendarDay->id)->count();
+                $calendarDay->availability_status = $this->calculateAvailabilityStatus($calendarDay);
+                $calendarDay->save();
+                $calendarDay->available_slots = $calendarDay->total_slots - $calendarDay->booked_slots;
+                $calendarDays->push($calendarDay);
+            } else {
+                // Si no existe, crea un día sin disponibilidad
+                $calendarDays->push((object) [
+                    'date' => $date,
+                    'availability_status' => 'gray',
+                    'booked_slots' => 0,
+                    'total_slots' => 0,
+                    'manual_override' => false,
+                    'available_slots' => 0,
+                ]);
+            }
         }
 
         // Obtén la fecha preseleccionada (si existe)
         $preselectedDate = $request->input('date', null);
 
         // Retorna la vista con los días del calendario y la fecha preseleccionada
-        return view('appointments.create', compact('calendarDays', 'preselectedDate'));
+        return view('appointments.create', [
+            'calendarDays' => $calendarDays,
+            'preselectedDate' => $preselectedDate
+        ]);
     }
 
     // Almacenar una nueva cita
@@ -59,6 +77,9 @@ class AppointmentsController extends Controller
         $request->validate([
             'calendar_day' => 'required|date|after_or_equal:today', // La fecha debe ser hoy o futura
             'time_slot' => 'required|date_format:H:i|after_or_equal:09:00|before_or_equal:16:00', // La hora debe estar entre 09:00 y 16:00
+            'requester_name' => 'required|string|max:255',
+            'requester_email' => 'required|email|max:255',
+            'requester_phone' => 'required|string|max:20',
             'description' => 'nullable|string|max:1000', // Validar la descripción (opcional)
         ]);
 
@@ -85,6 +106,9 @@ class AppointmentsController extends Controller
             'time_slot' => $request->time_slot,
             'description' => $request->description, // Guardar la descripción
             'status' => 'pending', // Estado inicial de la cita
+            'requester_name' => $request->requester_name,
+            'requester_email' => $request->requester_email,
+            'requester_phone' => $request->requester_phone,
         ]);
 
         // Actualizar todos los días del calendario

@@ -15,6 +15,9 @@ class Appointment extends Model
         'time_slot',
         'status',
         'description',
+        'requester_name',
+        'requester_email',
+        'requester_phone',
     ];
 
     // Relación con el modelo User
