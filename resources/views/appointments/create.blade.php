@@ -26,10 +26,13 @@
         </div>
         {{-- Selección de la hora --}}
         <div class="mb-3">
-            <label for="time_slot" class="form-label">Hora</label>
-            <input type="time" id="time_slot" name="time_slot" class="form-control" min="09:00" max="16:00" step="3600" required>
-            <small class="form-text text-muted">Selecciona una hora entre las 09:00 y las 16:00.</small>
-        </div>
+    <label for="time_slot" class="form-label">Hora</label>
+    <select id="time_slot" name="time_slot" class="form-control" required>
+        <option value="">Selecciona un horario</option>
+        <!-- Las opciones se llenarán dinámicamente con JS -->
+    </select>
+    <small class="form-text text-muted">Selecciona una hora entre las 09:00 y las 16:00.</small>
+</div>
 
         {{-- Descripción del trabajo --}}
         <div class="mb-3">

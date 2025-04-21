@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class appointments extends Model
+class Appointment extends Model
 {
     use HasFactory;
 
@@ -26,6 +26,6 @@ class appointments extends Model
 
     public function calendarDay()
     {
-        return $this->belongsTo(calendar_days::class, 'calendar_day_id');
+        return $this->belongsTo(CalendarDay::class, 'calendar_day_id');
     }
 }

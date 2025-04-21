@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Appointment;
 
-class calendar_days extends Model
+class CalendarDay extends Model
 {
     use HasFactory;
 
@@ -24,7 +25,7 @@ class calendar_days extends Model
     // Relación con las citas
     public function appointments()
     {
-        return $this->hasMany(appointments::class, 'calendar_day_id');
+        return $this->hasMany(Appointment::class, 'calendar_day_id');
     }
 
     // Método para obtener los horarios disponibles

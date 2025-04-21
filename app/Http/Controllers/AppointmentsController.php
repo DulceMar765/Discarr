@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\appointments;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\calendar_days; // Corregido: Se usa calendar_days en lugar de CalendarDay
+use App\Models\CalendarDay; // Corregido: Se usa calendar_days en lugar de CalendarDay
 
 class AppointmentsController extends Controller
 {
     // Mostrar todas las citas
     public function index()
     {
-        $appointments = appointments::all();
-        $calendarDays = calendar_days::all();
+        $appointments = Appointment::all();
+        $calendarDays = CalendarDay::all();
         return view('appointments.index', compact('appointments', 'calendarDays'));
     }
 
@@ -26,7 +26,7 @@ class AppointmentsController extends Controller
         // Genera los próximos 60 días si faltan días en la base de datos
         for ($i = 0; $i < 60; $i++) {
             $date = now()->addDays($i)->format('Y-m-d');
-            calendar_days::updateOrCreate(
+            CalendarDay::updateOrCreate(
                 ['date' => $date], // Condición para evitar duplicados
                 [
                     'availability_status' => 'green', // Por defecto, todos los días están disponibles
@@ -37,11 +37,11 @@ class AppointmentsController extends Controller
         }
 
         // Obtén los días del calendario con sus citas
-        $calendarDays = calendar_days::all();
+        $calendarDays = CalendarDay::all();
 
         // Actualiza los `booked_slots` y el `availability_status` de cada día
         foreach ($calendarDays as $calendarDay) {
-            $calendarDay->booked_slots = appointments::where('calendar_day_id', $calendarDay->id)->count();
+            $calendarDay->booked_slots = Appointment::where('calendar_day_id', $calendarDay->id)->count();
             $calendarDay->availability_status = $this->calculateAvailabilityStatus($calendarDay);
             $calendarDay->save();
         }
@@ -63,14 +63,14 @@ class AppointmentsController extends Controller
         ]);
 
         // Buscar el día del calendario basado en la fecha seleccionada
-        $calendarDay = calendar_days::where('date', $request->calendar_day)->first();
+        $calendarDay = CalendarDay::where('date', $request->calendar_day)->first();
 
         if (!$calendarDay) {
             return redirect()->back()->withErrors(['calendar_day' => 'El día seleccionado no está disponible.']);
         }
 
         // Verificar si el horario ya está ocupado
-        $existingAppointment = appointments::where('calendar_day_id', $calendarDay->id)
+        $existingAppointment = Appointment::where('calendar_day_id', $calendarDay->id)
             ->where('time_slot', $request->time_slot)
             ->first();
 
@@ -79,7 +79,7 @@ class AppointmentsController extends Controller
         }
 
         // Crear la cita
-        appointments::create([
+        Appointment::create([
             'user_id' => Auth::id(), // ID del usuario autenticado
             'calendar_day_id' => $calendarDay->id,
             'time_slot' => $request->time_slot,
@@ -96,7 +96,7 @@ class AppointmentsController extends Controller
     // Eliminar una cita
     public function destroy($id)
     {
-        $appointment = appointments::findOrFail($id);
+        $appointment = Appointment::findOrFail($id);
         $appointment->delete();
 
         // Actualizar todos los días del calendario
@@ -107,8 +107,8 @@ class AppointmentsController extends Controller
 
     public function edit($id)
     {
-        $appointment = appointments::findOrFail($id); // Corregido: Se usa appointments en lugar de Appointment
-        $calendarDays = calendar_days::all(); // Corregido: Se usa calendar_days en lugar de CalendarDay
+        $appointment = Appointment::findOrFail($id); // Corregido: Se usa appointments en lugar de Appointment
+        $calendarDays = CalendarDay::all(); // Corregido: Se usa calendar_days en lugar de CalendarDay
         return view('appointments.edit', compact('appointment', 'calendarDays'));
     }
 
@@ -120,7 +120,7 @@ class AppointmentsController extends Controller
             'description' => 'nullable|string|max:1000', // Validar la descripción (opcional)
         ]);
 
-        $appointment = appointments::findOrFail($id); // Corregido: Se usa appointments en lugar de Appointment
+        $appointment = Appointment::findOrFail($id); // Corregido: Se usa appointments en lugar de Appointment
         $appointment->update([
             'calendar_day_id' => $request->calendar_day_id,
             'time_slot' => $request->time_slot,
@@ -133,8 +133,8 @@ class AppointmentsController extends Controller
     // Método para actualizar booked_slots
     private function updateBookedSlots($calendarDayId)
     {
-        $calendarDay = calendar_days::findOrFail($calendarDayId); // Corregido: Se usa calendar_days en lugar de CalendarDay
-        $calendarDay->booked_slots = appointments::where('calendar_day_id', $calendarDayId)->count();
+        $calendarDay = CalendarDay::findOrFail($calendarDayId); // Corregido: Se usa calendar_days en lugar de CalendarDay
+        $calendarDay->booked_slots = Appointment::where('calendar_day_id', $calendarDayId)->count();
         $calendarDay->availability_status = $this->calculateAvailabilityStatus($calendarDay);
         $calendarDay->save();
     }
@@ -160,11 +160,11 @@ class AppointmentsController extends Controller
     private function updateAllCalendarDays()
     {
         // Obtén todos los días del calendario
-        $calendarDays = calendar_days::all();
+        $calendarDays = CalendarDay::all();
 
         foreach ($calendarDays as $calendarDay) {
             // Actualiza el número de slots reservados
-            $calendarDay->booked_slots = appointments::where('calendar_day_id', $calendarDay->id)->count();
+            $calendarDay->booked_slots = Appointment::where('calendar_day_id', $calendarDay->id)->count();
 
             // Si hay un override manual, no se cambia el estado automáticamente
             if ($calendarDay->manual_override) {
@@ -188,7 +188,7 @@ class AppointmentsController extends Controller
     public function deletePastDays()
     {
         // Elimina los días anteriores a la fecha actual
-        calendar_days::where('date', '<', now()->format('Y-m-d'))->delete();
+        CalendarDay::where('date', '<', now()->format('Y-m-d'))->delete();
 
         return redirect()->route('appointments.index')->with('success', 'Días pasados eliminados correctamente.');
     }

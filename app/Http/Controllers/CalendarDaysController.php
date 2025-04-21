@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\calendar_days;
+use App\Models\CalendarDay;
 use Illuminate\Http\Request;
 
 class CalendarDaysController extends Controller
@@ -18,7 +18,7 @@ class CalendarDaysController extends Controller
     public function create(Request $request)
     {
         // Obtén los días del calendario con sus citas
-        $calendarDays = calendar_days::with('appointments')->get();
+        $calendarDays = CalendarDay::with('appointments')->get();
     
         // Agrega los horarios disponibles a cada día
         $calendarDays->each(function ($day) {

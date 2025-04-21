@@ -1,3 +1,9 @@
+:root {
+  --primary-color: #ffc107; /* Amarillo/verde, puedes ajustar el color */
+  --dark-bg: #181818;      /* Fondo oscuro, puedes ajustar el color */
+  --secondary-color: #2ecc71; /* Verde secundario, opcional */
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

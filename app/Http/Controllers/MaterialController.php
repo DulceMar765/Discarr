@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\material;
+use App\Models\Material;
 use Illuminate\Http\Request;
 
 class MaterialController extends Controller
@@ -34,7 +34,7 @@ class MaterialController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(material $material)
+    public function show(Material $material)
     {
         //
     }
@@ -42,7 +42,7 @@ class MaterialController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(material $material)
+    public function edit(Material $material)
     {
         //
     }
@@ -50,7 +50,7 @@ class MaterialController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, material $material)
+    public function update(Request $request, Material $material)
     {
         //
     }
@@ -58,7 +58,7 @@ class MaterialController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(material $material)
+    public function destroy(Material $material)
     {
         //
     }

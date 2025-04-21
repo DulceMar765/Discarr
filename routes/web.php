@@ -15,6 +15,34 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+// Login manual
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+Route::post('/login', function (Illuminate\Http\Request $request) {
+    $credentials = $request->only('email', 'password');
+    if (Auth::attempt($credentials, $request->filled('remember'))) {
+        $request->session()->regenerate();
+        return redirect('/admin'); // Siempre redirige a admin
+    }
+    return back()->with('error', 'Credenciales incorrectas.')->withInput();
+});
+
+// Ruta protegida para admin
+Route::get('/admin', function () {
+    if (!Auth::check()) {
+        return redirect('/login');
+    }
+    if (Auth::user()->role !== 'admin') {
+        abort(403, 'No tienes permisos para acceder a esta sección.');
+    }
+    $folders = [
+        'customer', 'material', 'categorie', 'supplier', 'employee'
+    ];
+    return view('admin.index', compact('folders'));
+});
+
 // Páginas estáticas
 Route::get('/servicios', function () {
     return view('servicios.index');
@@ -39,7 +67,7 @@ Route::resource('supplier', SupplierController::class);
 Route::resource('employee', EmployeeController::class);
 
 // Rutas de autenticación
-require __DIR__.'/auth.php';
+// require __DIR__.'/auth.php';
 
 // Rutas protegidas por autenticación
 Route::middleware(['auth'])->group(function () {

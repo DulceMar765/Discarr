@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\supplier;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class SupplierController extends Controller
@@ -17,8 +17,8 @@ class SupplierController extends Controller
         public function index()
         {
             // Obtiene todos los proveedores y los pasa a la vista
-            $suppliers = Supplier::all();
-            return view('admin.supplier.index', compact('suppliers'));
+            $Suppliers = Supplier::all();
+            return view('admin.Supplier.index', compact('Suppliers'));
         }
     
         /**
@@ -27,7 +27,7 @@ class SupplierController extends Controller
         public function create()
         {
             // Muestra el formulario para crear un proveedor
-            return view('admin.supplier.create');
+            return view('admin.Supplier.create');
         }
     
         /**
@@ -37,9 +37,9 @@ class SupplierController extends Controller
         {
             // Valida los datos del formulario
             $request->validate([
-                'name' => 'required|string|max:255|unique:suppliers,name',
+                'name' => 'required|string|max:255|unique:Suppliers,name',
                 'contact_name' => 'nullable|string|max:255',
-                'email' => 'nullable|email|unique:suppliers,email',
+                'email' => 'nullable|email|unique:Suppliers,email',
                 'phone_number' => 'nullable|string|max:20',
                 'address' => 'nullable|string|max:1000',
                 'website' => 'nullable|url|max:255',
@@ -50,37 +50,37 @@ class SupplierController extends Controller
             // Crea el proveedor
             Supplier::create($request->all());
     
-            return redirect()->route('suppliers.index')->with('success', 'Proveedor agregado exitosamente.');
+            return redirect()->route('Suppliers.index')->with('success', 'Proveedor agregado exitosamente.');
         }
     
         /**
          * Display the specified resource.
          */
-        public function show(Supplier $supplier)
+        public function show(Supplier $Supplier)
         {
             // Muestra los detalles de un proveedor
-            return view('suppliers.show', compact('supplier'));
+            return view('Suppliers.show', compact('Supplier'));
         }
     
         /**
          * Show the form for editing the specified resource.
          */
-        public function edit(Supplier $supplier)
+        public function edit(Supplier $Supplier)
         {
             // Muestra el formulario de edición del proveedor
-            return view('admin.supplier.edit', compact('supplier'));
+            return view('admin.Supplier.edit', compact('Supplier'));
         }
     
         /**
          * Update the specified resource in storage.
          */
-        public function update(Request $request, Supplier $supplier)
+        public function update(Request $request, Supplier $Supplier)
         {
             // Valida los datos del formulario
             $request->validate([
-                'name' => 'required|string|max:255|unique:suppliers,name,' . $supplier->id,
+                'name' => 'required|string|max:255|unique:Suppliers,name,' . $Supplier->id,
                 'contact_name' => 'nullable|string|max:255',
-                'email' => 'nullable|email|unique:suppliers,email,' . $supplier->id,
+                'email' => 'nullable|email|unique:Suppliers,email,' . $Supplier->id,
                 'phone_number' => 'nullable|string|max:20',
                 'address' => 'nullable|string|max:1000',
                 'website' => 'nullable|url|max:255',
@@ -89,20 +89,19 @@ class SupplierController extends Controller
             ]);
     
             // Actualiza el proveedor
-            $supplier->update($request->all());
+            $Supplier->update($request->all());
     
-            return redirect()->route('suppliers.index')->with('success', 'Proveedor actualizado exitosamente.');
+            return redirect()->route('Suppliers.index')->with('success', 'Proveedor actualizado exitosamente.');
         }
     
         /**
          * Remove the specified resource from storage.
          */
-        public function destroy(Supplier $supplier)
+        public function destroy(Supplier $Supplier)
         {
             // Elimina el proveedor
-            $supplier->delete();
+            $Supplier->delete();
     
-            return redirect()->route('suppliers.index')->with('success', 'Proveedor eliminado exitosamente.');
+            return redirect()->route('Suppliers.index')->with('success', 'Proveedor eliminado exitosamente.');
         }
     }
-    
