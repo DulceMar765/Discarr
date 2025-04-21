@@ -61,10 +61,18 @@ Route::resource('projects.costs', ProjectCostController::class)
     ->except(['show'])
     ->parameters(['costs' => 'projectCost']);
 
-// Rutas generales
-Route::resource('categories', CategoryController::class);
-Route::resource('supplier', SupplierController::class);
+//vista admin
+Route::get('/admin', function () {
+    return view('layouts.admin');
+})->name('admin.dashboard');
+
+
+// routes/web.php
+
 Route::resource('employee', EmployeeController::class);
+Route::resource('supplier', SupplierController::class);
+Route::resource('categories', CategoryController::class);
+
 
 // Rutas de autenticación
 // require __DIR__.'/auth.php';
@@ -78,6 +86,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/appointments/{id}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{id}', [AppointmentsController::class, 'update'])->name('appointments.update');
 });
+// Rutas de autenticación
+require __DIR__.'/auth.php';
 
 Route::get('/dashboard', function () {
     return view('dashboard');

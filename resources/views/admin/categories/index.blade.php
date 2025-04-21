@@ -1,10 +1,10 @@
-{{-- resources/views/admin/categorie/index.blade.php --}}
+{{-- resources/views/admin/categories/index.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
 <div class="container">
     <h1>Lista de Categorías</h1>
-    <a href="{{ route('categorie.create') }}" class="btn btn-primary mb-3">Agregar Categoría</a>
+    <a href="{{ route('categories.create') }}" class="btn btn-primary mb-3">Agregar Categoría</a>
     
     @if(session('success'))
         <div class="alert alert-success">
@@ -26,8 +26,8 @@
                 <td>{{ $category->id }}</td>
                 <td>{{ $category->name }}</td>
                 <td>
-                    <a href="{{ route('categorie.edit', $category->id) }}" class="btn btn-warning">Editar</a>
-                    <form action="{{ route('categorie.destroy', $category->id) }}" method="POST" class="d-inline">
+                <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-warning">Editar</a>
+                   <form action="{{ route('categories.destroy', $category->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Eliminar</button>

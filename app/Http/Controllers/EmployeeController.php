@@ -25,7 +25,7 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        return view('employee.create');
+        return view('admin.employee.create');
     }
 
     /**
@@ -33,21 +33,24 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
+        // Validación
         $validated = $request->validate([
             'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:employees',
+            'email'     => 'required|email|unique:categories,email',
             'phone'     => 'required|string|max:20',
             'position'  => 'required|string|max:255',
             'salary'    => 'required|numeric|min:0',
             'hire_date' => 'required|date',
             'address'   => 'nullable|string',
-            'status'    => 'boolean'
+            'status'    => 'nullable|boolean',
         ]);
 
-        Employee::create($validated);
+        // Crear la categoría
+        Category::create($validated);
 
-        return redirect()->route('employee.index')
-            ->with('success', 'Empleado creado exitosamente.');
+        // Redirigir con éxito
+        return redirect()->route('categories.index')
+            ->with('success', 'Categoría creada exitosamente.');
     }
 
     /**
