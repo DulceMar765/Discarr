@@ -131,25 +131,70 @@ class AppointmentsController extends Controller
 
     public function edit($id)
     {
-        $appointment = Appointment::findOrFail($id); // Corregido: Se usa appointments en lugar de Appointment
-        $calendarDays = CalendarDay::all(); // Corregido: Se usa calendar_days en lugar de CalendarDay
-        return view('appointments.edit', compact('appointment', 'calendarDays'));
+        // Encuentra la cita por su ID
+        $appointment = Appointment::findOrFail($id);
+
+        // Obtén todos los días del calendario
+        $calendarDays = CalendarDay::all()->map(function ($day) {
+            $day->available_slots = Appointment::where('calendar_day_id', $day->id)
+                ->where('time_slot', '>=', now()->format('H:i')) // Solo horarios futuros
+                ->pluck('time_slot')
+                ->toArray();
+            return $day;
+        });
+
+        // Preselecciona la fecha y hora de la cita
+        $preselectedDate = $appointment->calendarDay->date;
+        $preselectedTime = $appointment->time_slot;
+
+        // Retorna la vista de edición con los datos necesarios
+        return view('appointments.edit', compact('appointment', 'calendarDays', 'preselectedDate', 'preselectedTime'));
     }
 
     public function update(Request $request, $id)
     {
+        // Validar los datos enviados desde el formulario
         $request->validate([
-            'calendar_day_id' => 'required|exists:calendar_days,id',
-            'time_slot' => 'required',
-            'description' => 'nullable|string|max:1000', // Validar la descripción (opcional)
+            'calendar_day' => 'required|date', // Asegura que se envíe una fecha válida
+            'time_slot' => 'required|date_format:H:i', // Valida el formato de la hora
+            'requester_name' => 'required|string|max:255', // Valida el nombre del solicitante
+            'requester_email' => 'required|email|max:255', // Valida el correo electrónico
+            'requester_phone' => 'required|string|max:15', // Valida el teléfono
+            'description' => 'nullable|string|max:1000', // La descripción es opcional
         ]);
 
-        $appointment = Appointment::findOrFail($id); // Corregido: Se usa appointments en lugar de Appointment
+        // Encuentra la cita por su ID
+        $appointment = Appointment::findOrFail($id);
+
+        // Encuentra el día del calendario correspondiente
+        $calendarDay = CalendarDay::where('date', $request->calendar_day)->first();
+
+        if (!$calendarDay) {
+            return redirect()->back()->withErrors(['calendar_day' => 'El día seleccionado no es válido.']);
+        }
+
+        // Verifica si el horario ya está ocupado por otra cita
+        $existingAppointment = Appointment::where('calendar_day_id', $calendarDay->id)
+            ->where('time_slot', $request->time_slot)
+            ->where('id', '!=', $id) // Excluye la cita actual
+            ->first();
+
+        if ($existingAppointment) {
+            return redirect()->back()->withErrors(['time_slot' => 'El horario seleccionado ya está reservado.']);
+        }
+
+        // Actualiza los datos de la cita
         $appointment->update([
-            'calendar_day_id' => $request->calendar_day_id,
+            'calendar_day_id' => $calendarDay->id,
             'time_slot' => $request->time_slot,
-            'description' => $request->description, // Actualizar la descripción
+            'requester_name' => $request->requester_name,
+            'requester_email' => $request->requester_email,
+            'requester_phone' => $request->requester_phone,
+            'description' => $request->description,
         ]);
+
+        // Actualiza los slots reservados y el estado del día del calendario
+        $this->updateBookedSlots($calendarDay->id);
 
         return redirect()->route('appointments.index')->with('success', 'Cita actualizada correctamente.');
     }
