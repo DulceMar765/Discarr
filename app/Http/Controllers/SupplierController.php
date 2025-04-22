@@ -17,8 +17,8 @@ class SupplierController extends Controller
         public function index()
         {
             // Obtiene todos los proveedores y los pasa a la vista
-            $Suppliers = Supplier::all();
-            return view('admin.Supplier.index', compact('Suppliers'));
+            $suppliers = Supplier::all(); // obtén todos los proveedores
+             return view('admin.supplier.index', compact('suppliers'));
         }
     
         /**
@@ -37,9 +37,9 @@ class SupplierController extends Controller
         {
             // Valida los datos del formulario
             $request->validate([
-                'name' => 'required|string|max:255|unique:Suppliers,name',
+                'name' => 'required|string|max:255|unique:suppliers,name',
                 'contact_name' => 'nullable|string|max:255',
-                'email' => 'nullable|email|unique:Suppliers,email',
+                'email' => 'nullable|email|unique:suppliers,email',
                 'phone_number' => 'nullable|string|max:20',
                 'address' => 'nullable|string|max:1000',
                 'website' => 'nullable|url|max:255',

@@ -4,7 +4,7 @@
 @section('content')
 <div class="container">
     <h1>Lista de Empleados</h1>
-    <a href="{{ route('admin.employee.create') }}" class="btn btn-primary mb-3">Agregar Empleado</a>
+    <a href="{{ route('employee.create') }}" class="btn btn-primary mb-3">Agregar Empleado</a>
     <table class="table">
         <thead>
             <tr>
@@ -21,8 +21,8 @@
                 <td>{{ $employee->name }}</td>
                 <td>{{ $employee->email }}</td>
                 <td>
-                    <a href="{{ route('admin.employee.edit', $employee->id) }}" class="btn btn-warning">Editar</a>
-                    <form action="{{ route('admin.employee.destroy', $employee->id) }}" method="POST" class="d-inline">
+                    <a href="{{ route('employee.edit', $employee->id) }}" class="btn btn-warning">Editar</a>
+                    <form action="{{ route('employee.destroy', $employee->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Eliminar</button>

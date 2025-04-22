@@ -90,10 +90,18 @@ Route::resource('projects.costs', ProjectCostController::class)
     ->except(['show'])
     ->parameters(['costs' => 'projectCost']);
 
-// Rutas generales
-Route::resource('categories', CategoryController::class);
-Route::resource('supplier', SupplierController::class);
+//vista admin
+Route::get('/admin', function () {
+    return view('layouts.admin');
+})->name('admin.dashboard');
+
+
+// routes/web.php
+
 Route::resource('employee', EmployeeController::class);
+Route::resource('supplier', SupplierController::class);
+Route::resource('categories', CategoryController::class);
+
 
 // Rutas protegidas por autenticación para usuarios con rol "user"
 Route::middleware(['auth'])->group(function () {
@@ -109,6 +117,8 @@ Route::middleware(['auth'])->group(function () {
         return redirect('/'); // Usuario normal se dirige a la página de inicio
     })->name('appointments.store');
 });
+// Rutas de autenticación
+require __DIR__.'/auth.php';
 
 // Rutas protegidas por autenticación y rol "admin"
 Route::middleware(['auth'])->group(function () {

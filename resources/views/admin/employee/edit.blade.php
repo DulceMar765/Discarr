@@ -1,10 +1,10 @@
-{{-- resources/views/admin/employees/edit.blade.php --}}
+{{-- resources/views/admin/employee/edit.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
 <div class="container">
     <h1>Editar Empleado</h1>
-    <form action="{{ route('employees.update', $employee->id) }}" method="POST">
+    <form action="{{ route('employee.update', $employee->id) }}" method="POST">
         @csrf
         @method('PUT')
         <div class="form-group">
