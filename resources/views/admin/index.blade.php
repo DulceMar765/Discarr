@@ -2,14 +2,17 @@
 
 @section('content')
 <div class="container mt-5">
-    <h1 class="mb-4">Panel de Administración</h1>
+    <h1 class="text-center mb-4">Panel de Administración</h1>
     <div class="row">
         @foreach ($folders as $folder)
-            <div class="col-md-4 mb-3">
-                <div class="card h-100">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <h5 class="card-title text-capitalize">{{ $folder }}</h5>
-                        <a href="{{ url('admin/' . $folder) }}" class="btn btn-primary mt-2">Ver módulo</a>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                        <h5 class="card-title text-capitalize mb-3">{{ $folder }}</h5>
+                        {{-- Verifica si el módulo es "appointments" --}}
+                        <a href="{{ $folder === 'appointments' ? url('/appointments') : url('admin/' . $folder) }}" class="btn btn-primary btn-block">
+                            Ver módulo
+                        </a>
                     </div>
                 </div>
             </div>

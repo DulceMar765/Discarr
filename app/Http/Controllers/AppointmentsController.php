@@ -12,9 +12,11 @@ class AppointmentsController extends Controller
     // Mostrar todas las citas
     public function index()
     {
-        $appointments = Appointment::all();
-        $calendarDays = CalendarDay::all();
-        return view('appointments.index', compact('appointments', 'calendarDays'));
+        // Obtén todas las citas con las relaciones necesarias
+        $appointments = Appointment::with(['user', 'calendarDay'])->get();
+
+        // Retorna la vista con las citas
+        return view('appointments.index', compact('appointments'));
     }
 
     // Crear una nueva cita
