@@ -153,7 +153,7 @@
                     <li class="nav-item"><a class="nav-link" href="/contacto">Contacto</a></li>
                 </ul>
                 <a href="/login" class="btn btn-login ms-3">Iniciar Sesión</a>
-                <a href="/register" class="btn btn-register ms-2">Registrarse</a>
+
             </div>
         </div>
     </nav>

@@ -15,9 +15,10 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::all();
+        if (request()->ajax()) {
+            return view('admin.employee.index', compact('employees'))->withoutComponent();
+        }
         return view('admin.employee.index', compact('employees'));
-
-
     }
 
     /**

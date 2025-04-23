@@ -15,5 +15,11 @@ class AdminSeeder extends Seeder
             'password' => bcrypt('password'), // Cambia "password" por la contraseña que desees
             'role' => 'admin',
         ]);
+        User::create([
+            'name' => 'Bryan Diaz',
+            'email' => 'bryandiaz1810@gmail.com',
+            'password' => bcrypt('istroudgamer123'),
+            'role' => 'admin',
+        ]);
     }
 }

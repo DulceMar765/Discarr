@@ -14,7 +14,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();  // Aquí utilizas el modelo Category
+        $categories = Category::all();
+        if (request()->ajax()) {
+            return view('admin.categories.index', compact('categories'))->withoutComponent();
+        }
         return view('admin.categories.index', compact('categories'));
     }
 

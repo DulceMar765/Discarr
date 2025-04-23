@@ -35,10 +35,6 @@ Route::post('/login', function (Illuminate\Http\Request $request) {
 });
 
 // Registro manual
-Route::get('/register', function () {
-    return view('register');
-})->name('register');
-
 Route::post('/register', function (Illuminate\Http\Request $request) {
     $request->validate([
         'name' => 'required|string|max:255',
@@ -117,7 +113,12 @@ Route::middleware(['auth'])->group(function () {
         return redirect('/'); // Usuario normal se dirige a la página de inicio
     })->name('appointments.store');
 });
-// Rutas de autenticación
+// Rutas admin para subventanas SPA
+Route::get('/employee', [App\Http\Controllers\EmployeeController::class, 'index'])->name('employee.index');
+Route::get('/supplier', [App\Http\Controllers\SupplierController::class, 'index'])->name('supplier.index');
+Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+
+// Aquí van las rutas de tu aplicación
 require __DIR__.'/auth.php';
 
 // Rutas protegidas por autenticación y rol "admin"

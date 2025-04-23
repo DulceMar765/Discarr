@@ -1,4 +1,4 @@
-<x-guest-layout>
+<!-- Registro deshabilitado -->
     <form method="POST" action="{{ route('register') }}">
         @csrf
 

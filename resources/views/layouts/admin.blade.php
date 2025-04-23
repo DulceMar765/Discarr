@@ -69,13 +69,9 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <h4><i class="bi bi-speedometer2"></i> Admin Discarr</h4>
-        <a class="nav-link"                     href="{{ route('employee.index') }}">          
-  <i class="bi bi-person-badge-fill"></i> Empleados
-        </a>
-        <a class="nav-link"   href="{{ route('supplier.index') }}">               <i class="bi bi-truck"></i> Proveedores
-        </a>
-        <a class="nav-link" href="{{ route('categories.index') }}">             <i class="bi bi-tags-fill"></i> Categorías
-        </a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('employee.index') }}'); return false;"><i class="bi bi-person-badge-fill"></i> Empleados</a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('supplier.index') }}'); return false;"><i class="bi bi-truck"></i> Proveedores</a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('categories.index') }}'); return false;"><i class="bi bi-tags-fill"></i> Categorías</a>
         <a class="nav-link mt-auto" href="{{ route('logout') }}">
             <i class="bi bi-box-arrow-right"></i> Cerrar sesión
         </a>
@@ -83,54 +79,25 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <h1 class="mb-4">Inicio del Panel de Administración</h1>
+    @yield('main-content')
+</div>
 
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card shadow-sm p-3">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-person-badge-fill me-3"></i>
-                        <div>
-                            <h5 class="mb-0">Gestión de Empleados</h5>
-                            <small><a href="{{ route('employee.index') }}">Ir a empleados</a></small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card shadow-sm p-3">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-truck me-3"></i>
-                        <div>
-                            <h5 class="mb-0">Gestión de Proveedores</h5>
-                            <small><a href="{{ route('supplier.index') }}">Ir a proveedores</a></small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card shadow-sm p-3">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-tags-fill me-3"></i>
-                        <div>
-                            <h5 class="mb-0">Gestión de Categorías</h5>
-                            <small><a href="{{ route('categories.index') }}">Ir a categorías</a></small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <hr class="my-5">
-
-        <div class="alert alert-primary text-center" role="alert">
-            Bienvenido al sistema de administración del negocio. Usa el panel lateral para navegar por las secciones disponibles.
-        </div>
-    </div>
-
-    <!-- Bootstrap JS -->
+    <!-- SPA Admin Loader -->
+    <script>
+    function loadAdminSection(url) {
+        fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then(response => {
+                if (!response.ok) throw new Error('Error al cargar la sección');
+                return response.text();
+            })
+            .then(html => {
+                document.querySelector('.main-content').innerHTML = html;
+            })
+            .catch(err => {
+                document.querySelector('.main-content').innerHTML = '<div class="alert alert-danger">No se pudo cargar la sección.</div>';
+            });
+    }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

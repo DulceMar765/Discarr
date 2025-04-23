@@ -16,9 +16,11 @@ class SupplierController extends Controller
          */
         public function index()
         {
-            // Obtiene todos los proveedores y los pasa a la vista
-            $suppliers = Supplier::all(); // obtén todos los proveedores
-             return view('admin.supplier.index', compact('suppliers'));
+            $suppliers = Supplier::all();
+            if (request()->ajax()) {
+                return view('admin.supplier.index', compact('suppliers'))->withoutComponent();
+            }
+            return view('admin.supplier.index', compact('suppliers'));
         }
     
         /**
