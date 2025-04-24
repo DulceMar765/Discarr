@@ -3,63 +3,70 @@
 namespace App\Http\Controllers;
 
 use App\Models\Material;
+use App\Models\MaterialProject;
 use Illuminate\Http\Request;
 
 class MaterialController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Listado de materiales y stock actual
     public function index()
     {
-        //
+        $materials = Material::all();
+        return view('materials.index', compact('materials'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Formulario de alta de material
     public function create()
     {
-        //
+        return view('materials.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Guardar material nuevo
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'quantity' => 'required|numeric|min:0',
+            'unit' => 'required|string|max:50',
+            'price' => 'required|numeric|min:0',
+        ]);
+        Material::create($request->all());
+        return redirect()->route('materials.index')->with('success', 'Material creado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // Mostrar detalle de material (incluye uso por proyecto)
     public function show(Material $material)
     {
-        //
+        // Consulta del uso por proyecto
+        $usos = MaterialProject::where('material_id', $material->id)->with('project')->get();
+        return view('materials.show', compact('material', 'usos'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // Formulario de edición
     public function edit(Material $material)
     {
-        //
+        return view('materials.edit', compact('material'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // Actualizar material
     public function update(Request $request, Material $material)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'quantity' => 'required|numeric|min:0',
+            'unit' => 'required|string|max:50',
+            'price' => 'required|numeric|min:0',
+        ]);
+        $material->update($request->all());
+        return redirect()->route('materials.index')->with('success', 'Material actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Eliminar material
     public function destroy(Material $material)
     {
-        //
+        $material->delete();
+        return redirect()->route('materials.index')->with('success', 'Material eliminado.');
     }
 }
