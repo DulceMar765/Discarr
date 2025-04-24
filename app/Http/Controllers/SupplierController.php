@@ -16,12 +16,16 @@ class SupplierController extends Controller
          */
         public function index()
         {
-            $suppliers = Supplier::all();
-            if (request()->ajax()) {
-                return view('admin.supplier.index', compact('suppliers'))->withoutComponent();
-            }
-            return view('admin.supplier.index', compact('suppliers'));
+         $suppliers = Supplier::all();
+
+         if (request()->ajax()) {
+          return view('admin.supplier.index', compact('suppliers'))->render();
+         }
+
+    // En la carga normal podrías cargar el dashboard u otra vista padre
+    return view('admin.dashboard', compact('suppliers'));
         }
+
     
         /**
          * Show the form for creating a new resource.

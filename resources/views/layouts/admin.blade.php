@@ -3,64 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title>Panel de Administración</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             margin: 0;
             padding: 0;
             display: flex;
             min-height: 100vh;
-            font-family: Arial, sans-serif;
+            font-family: system-ui, sans-serif;
             background-color: #f8f9fa;
         }
 
         .sidebar {
             width: 250px;
             background-color: #0d6efd;
-            color: white;
+            color: #fff;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             position: fixed;
             top: 0;
             bottom: 0;
-            padding: 20px 0;
+            padding: 24px 0;
         }
 
         .sidebar h4 {
+            font-weight: 600;
+            font-size: 1.25rem;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .nav-link {
-            color: white;
-            padding: 12px 20px;
+        .sidebar .nav-link {
+            color: #fff;
+            padding: 12px 24px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             text-decoration: none;
             transition: background-color 0.2s;
         }
 
-        .nav-link i {
-            margin-right: 10px;
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            font-size: 1.1rem;
         }
 
         .main-content {
             margin-left: 250px;
             padding: 40px;
-            width: 100%;
+            width: calc(100% - 250px);
+            background-color: #fff;
+            min-height: 100vh;
         }
 
-        .card i {
-            font-size: 2rem;
-            color: #0d6efd;
+        .logout {
+            margin-top: auto;
+            padding: 0 24px;
+        }
+
+        .logout .btn {
+            width: 100%;
+            text-align: left;
+            color: #fff;
+            padding-left: 0;
+        }
+
+        .logout .btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .logout i {
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -69,35 +98,61 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <h4><i class="bi bi-speedometer2"></i> Admin Discarr</h4>
-        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('employee.index') }}'); return false;"><i class="bi bi-person-badge-fill"></i> Empleados</a>
-        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('supplier.index') }}'); return false;"><i class="bi bi-truck"></i> Proveedores</a>
-        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('categories.index') }}'); return false;"><i class="bi bi-tags-fill"></i> Categorías</a>
-        <a class="nav-link mt-auto" href="{{ route('logout') }}">
-            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+
+        <!-- Dashboard redirige normal -->
+        <a class="nav-link" href="{{ route('admin.dashboard') }}">
+            <i class="bi bi-layout-text-window-reverse"></i> Dashboard
         </a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('employee.index') }}'); return false;">
+            <i class="bi bi-person-badge-fill"></i> Empleados
+        </a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('supplier.index') }}'); return false;">
+            <i class="bi bi-truck"></i> Proveedores
+        </a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('categories.index') }}'); return false;">
+            <i class="bi bi-tags-fill"></i> Categorías
+        </a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('customer.index') }}'); return false;">
+            <i class="bi bi-person-circle"></i> Clientes
+        </a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('material.index') }}'); return false;">
+            <i class="bi bi-box-seam"></i> Material
+        </a>
+
+        <div class="logout mt-auto">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-link text-white">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
-    @yield('main-content')
-</div>
+    <div class="main-content" id="admin-content">
+        @yield('main-content')
+    </div>
 
-    <!-- SPA Admin Loader -->
-    <script>
-    function loadAdminSection(url) {
-        fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-            .then(response => {
-                if (!response.ok) throw new Error('Error al cargar la sección');
-                return response.text();
-            })
-            .then(html => {
-                document.querySelector('.main-content').innerHTML = html;
-            })
-            .catch(err => {
-                document.querySelector('.main-content').innerHTML = '<div class="alert alert-danger">No se pudo cargar la sección.</div>';
-            });
-    }
-    </script>
+    <!-- Bootstrap y JQuery -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- AJAX para cargar secciones -->
+    <script>
+        function loadAdminSection(url) {
+            $('#admin-content').html('<div class="text-center my-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(response) {
+                    $('#admin-content').html(response);
+                },
+                error: function(xhr) {
+                    $('#admin-content').html('<div class="alert alert-danger">Error al cargar el contenido.</div>');
+                }
+            });
+        }
+    </script>
 </body>
 </html>

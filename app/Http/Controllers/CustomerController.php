@@ -11,10 +11,14 @@ class CustomerController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        // Obtiene todos los clientes y los pasa a la vista
-        $customers = Customer::all();
-        return view('customers.index', compact('customers'));
+   {
+    $customers = Customer::all();
+
+    if (request()->ajax()) {
+        return view('admin.customers.index', compact('customers'))->render(); // Usa la ruta correcta a tu vista
+    }
+
+    return view('admin.dashboard', compact('customers')); // fallback si se accede sin AJAX
     }
 
     /**

@@ -1,7 +1,3 @@
-{{-- resources/views/admin/supplier/create.blade.php --}}
-@extends('layouts.app')
-
-@section('content')
 <div class="container">
     <h1>Agregar Proveedor</h1>
 
@@ -64,6 +60,8 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="#" onclick="loadAdminSection('{{ route('supplier.index') }}'); return false;" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
-@endsection
+
+

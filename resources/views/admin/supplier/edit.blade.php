@@ -1,7 +1,3 @@
-{{-- resources/views/admin/supplier/edit.blade.php --}}
-@extends('layouts.app')
-
-@section('content')
 <div class="container">
     <h1>Editar Proveedor</h1>
 
@@ -65,8 +61,8 @@
         </div>
 
         <button type="submit" class="btn btn-success">Actualizar</button>
-        <a href="{{ route('supplier.index') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="#" onclick="loadAdminSection('{{ route('supplier.index') }}'); return false;" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
-@endsection
+
 

@@ -92,12 +92,20 @@ Route::get('/admin', function () {
 })->name('admin.dashboard');
 
 
+//admin dasborh 
+
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+})->name('admin.dashboard');
+
+
 // routes/web.php
 
 Route::resource('employee', EmployeeController::class);
 Route::resource('supplier', SupplierController::class);
 Route::resource('categories', CategoryController::class);
-
+Route::resource('customer', CustomerController::class);
+Route::resource('material', MaterialController::class);
 
 // Rutas protegidas por autenticación para usuarios con rol "user"
 Route::middleware(['auth'])->group(function () {
@@ -151,6 +159,7 @@ Route::middleware(['auth'])->group(function () {
         return app(App\Http\Controllers\AppointmentsController::class)->destroy($id);
     })->name('appointments.destroy');
 });
+
 
 // Dashboard
 Route::get('/dashboard', function () {
