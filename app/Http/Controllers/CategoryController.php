@@ -13,13 +13,16 @@ class CategoryController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $categories = Category::all();
-        if (request()->ajax()) {
-            return view('admin.categories.index', compact('categories'))->withoutComponent();
-        }
-        return view('admin.categories.index', compact('categories'));
+   {
+    $categories = Category::all();
+
+    if (request()->ajax()) {
+        return view('admin.categories.index', compact('categories'))->render();
     }
+
+    return view('admin.dashboard', compact('categories')); // fallback si no es AJAX
+   }
+
 
     /**
      * Show the form for creating a new resource.

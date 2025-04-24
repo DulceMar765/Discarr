@@ -1,7 +1,3 @@
-{{-- resources/views/admin/employee/create.blade.php --}}
-@extends('layouts.app')
-
-@section('content')
 <div class="container">
     <h1>Agregar Empleado</h1>
 
@@ -88,7 +84,6 @@
 
         <!-- Botón para guardar -->
         <button type="submit" class="btn btn-primary mt-3">Guardar</button>
-        <a href="{{ route('employee.index') }}" class="btn btn-secondary mt-3">Cancelar</a>
+        <a href="#" onclick="loadAdminSection('{{ route('employee.index') }}'); return false;" class="btn btn-secondary mt-3">Cancelar</a>
     </form>
 </div>
-@endsection

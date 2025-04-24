@@ -1,10 +1,8 @@
 {{-- resources/views/admin/categories/edit.blade.php --}}
-@extends('layouts.app')
 
-@section('content')
 <div class="container">
     <h1>Editar Categoría</h1>
-    <form action="{{ route('categorie.update', $category->id) }}" method="POST">
+    <form action="{{ route('categories.update', $category->id) }}" method="POST">
         @csrf
         @method('PUT')
         <div class="mb-3">
@@ -15,7 +13,6 @@
             @enderror
         </div>
         <button type="submit" class="btn btn-success">Actualizar</button>
-        <a href="{{ route('categorie.index') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="#" onclick="loadAdminSection('{{ route('categories.index') }}'); return false;" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
-@endsection

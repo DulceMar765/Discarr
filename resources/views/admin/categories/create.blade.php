@@ -1,7 +1,5 @@
 {{-- resources/views/admin/categories/create.blade.php --}}
-@extends('layouts.app')
 
-@section('content')
 <div class="container">
     <h1>Agregar Categoría</h1>
 
@@ -30,7 +28,6 @@
         </div>
 
         <button type="submit" class="btn btn-success">Guardar</button>
-        <a href="{{ route('categories.index') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="#" onclick="loadAdminSection('{{ route('categories.index') }}'); return false;" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
-@endsection 

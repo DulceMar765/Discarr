@@ -15,19 +15,25 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::all();
+
         if (request()->ajax()) {
-            return view('admin.employee.index', compact('employees'))->withoutComponent();
+            return view('admin.employee.index', compact('employees'))->render();
         }
-        return view('admin.employee.index', compact('employees'));
+    
+        return view('admin.dashboard', compact('employees')); // fallback si se accede sin AJAX
     }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        return view('admin.employee.create');
+{
+    if (request()->ajax()) {
+        return view('admin.employee.create')->render();
     }
+
+    return view('admin.dashboard'); // O tu vista principal por defecto
+}
 
     /**
      * Store a newly created resource in storage.
