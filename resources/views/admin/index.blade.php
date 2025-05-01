@@ -9,8 +9,11 @@
                 <div class="card h-100 border-0 shadow-sm">
                     <div class="card-body text-center d-flex flex-column justify-content-between">
                         <h5 class="card-title text-capitalize mb-3">{{ $folder }}</h5>
-                        {{-- Verifica si el módulo es "appointments" --}}
-                        <a href="{{ $folder === 'appointments' ? url('/appointments') : url('admin/' . $folder) }}" class="btn btn-primary btn-block">
+                        {{-- Verifica si el módulo es "appointments" o "projects" --}}
+                        <a href="{{ 
+                            $folder === 'appointments' ? url('/appointments') : 
+                            ($folder === 'projects' ? url('/admin/projects') : url('admin/' . $folder)) 
+                        }}" class="btn btn-primary btn-block">
                             Ver módulo
                         </a>
                     </div>

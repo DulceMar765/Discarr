@@ -10,6 +10,9 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\CalendarDaysController;
 use App\Http\Controllers\ProjectCostController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\MaterialController;
 
 Route::get('/', function () {
     return view('home');
@@ -63,7 +66,7 @@ Route::get('/admin', function () {
         abort(403, 'No tienes permisos para acceder a esta sección.');
     }
     $folders = [
-        'customer', 'material', 'categorie', 'supplier', 'employee', 'appointments' // Agregamos "appointments"
+        'customer', 'material', 'categorie', 'supplier', 'employee', 'appointments', 'projects' // Agregamos "projects"
     ];
     return view('admin.index', compact('folders'));
 });
@@ -86,26 +89,35 @@ Route::resource('projects.costs', ProjectCostController::class)
     ->except(['show'])
     ->parameters(['costs' => 'projectCost']);
 
-//vista admin
+// Vista admin
 Route::get('/admin', function () {
     return view('layouts.admin');
 })->name('admin.dashboard');
 
-
-//admin dasborh 
-
+// Admin dashboard
 Route::get('/admin/dashboard', function () {
     return view('admin.dashboard');
 })->name('admin.dashboard');
 
+// Dashboard
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-// routes/web.php
+// Perfil del usuario
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
+// Recursos
 Route::resource('employee', EmployeeController::class);
 Route::resource('supplier', SupplierController::class);
 Route::resource('categories', CategoryController::class);
 Route::resource('customer', CustomerController::class);
 Route::resource('material', MaterialController::class);
+Route::resource('projects', ProjectController::class);
 
 // Rutas protegidas por autenticación para usuarios con rol "user"
 Route::middleware(['auth'])->group(function () {
@@ -121,54 +133,56 @@ Route::middleware(['auth'])->group(function () {
         return redirect('/'); // Usuario normal se dirige a la página de inicio
     })->name('appointments.store');
 });
+
 // Rutas admin para subventanas SPA
-Route::get('/employee', [App\Http\Controllers\EmployeeController::class, 'index'])->name('employee.index');
-Route::get('/supplier', [App\Http\Controllers\SupplierController::class, 'index'])->name('supplier.index');
-Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+Route::get('/employee', [EmployeeController::class, 'index'])->name('employee.index');
+Route::get('/supplier', [SupplierController::class, 'index'])->name('supplier.index');
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('/admin/projects', [App\Http\Controllers\ProjectController::class, 'index'])->name('admin.projects.index');
 
 // Aquí van las rutas de tu aplicación
 require __DIR__.'/auth.php';
 
+// Rutas para QR de proyectos
+Route::get('/project/status/{token}', [App\Http\Controllers\ProjectQRController::class, 'showProjectStatus'])->name('project.status');
+
 // Rutas protegidas por autenticación y rol "admin"
 Route::middleware(['auth'])->group(function () {
+    // Rutas para administración de QR de proyectos y correos electrónicos
+    
+    // Rutas para envío de correos de proyectos
+    Route::get('/admin/projects/{project}/email', [App\Http\Controllers\ProjectMailController::class, 'showSendForm'])->name('admin.projects.email.form');
+    Route::post('/admin/projects/{project}/email/send', [App\Http\Controllers\ProjectMailController::class, 'sendProjectStatus'])->name('admin.projects.email.send');
+    Route::post('/admin/projects/{project}/email/bulk', [App\Http\Controllers\ProjectMailController::class, 'sendBulkEmails'])->name('admin.projects.email.bulk');
+    Route::get('/project/{projectId}/qr', [App\Http\Controllers\ProjectQRController::class, 'generateQR'])->name('project.qr.generate');
+    Route::get('/project/{projectId}/qr/download', [App\Http\Controllers\ProjectQRController::class, 'downloadQR'])->name('project.qr.download');
+    Route::post('/project/{projectId}/regenerate-token', [App\Http\Controllers\ProjectQRController::class, 'regenerateToken'])->name('project.regenerate-token');
+    
     Route::get('/appointments', function () {
         if (Auth::user()->role !== 'admin') {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
-        return app(App\Http\Controllers\AppointmentsController::class)->index();
+        return app(AppointmentsController::class)->index();
     })->name('appointments.index');
 
     Route::get('/appointments/{id}/edit', function ($id) {
         if (Auth::user()->role !== 'admin') {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
-        return app(App\Http\Controllers\AppointmentsController::class)->edit($id);
+        return app(AppointmentsController::class)->edit($id);
     })->name('appointments.edit');
 
     Route::put('/appointments/{id}', function ($id) {
         if (Auth::user()->role !== 'admin') {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
-        return app(App\Http\Controllers\AppointmentsController::class)->update(request(), $id);
+        return app(AppointmentsController::class)->update(request(), $id);
     })->name('appointments.update');
 
     Route::delete('/appointments/{id}', function ($id) {
         if (Auth::user()->role !== 'admin') {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
-        return app(App\Http\Controllers\AppointmentsController::class)->destroy($id);
+        return app(AppointmentsController::class)->destroy($id);
     })->name('appointments.destroy');
-});
-
-
-// Dashboard
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-// Perfil del usuario
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });

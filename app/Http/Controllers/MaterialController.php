@@ -12,13 +12,13 @@ class MaterialController extends Controller
     public function index()
     {
         $materials = Material::all();
-        return view('materials.index', compact('materials'));
+        return view('admin.material.index', compact('materials'));
     }
 
     // Formulario de alta de material
     public function create()
     {
-        return view('materials.create');
+        return view('admin.material.create');
     }
 
     // Guardar material nuevo
@@ -40,13 +40,13 @@ class MaterialController extends Controller
     {
         // Consulta del uso por proyecto
         $usos = MaterialProject::where('material_id', $material->id)->with('project')->get();
-        return view('materials.show', compact('material', 'usos'));
+        return view('admin.material.show', compact('material', 'usos'));
     }
 
     // Formulario de edición
     public function edit(Material $material)
     {
-        return view('materials.edit', compact('material'));
+        return view('admin.material.edit', compact('material'));
     }
 
     // Actualizar material

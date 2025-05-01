@@ -16,8 +16,64 @@ class ProjectController extends Controller
     // Listado de proyectos
     public function index()
     {
-        $projects = Project::all();
-        return view('projects.index', compact('projects'));
+        $projects = Project::with(['projectEmployees.employee', 'materialProjects.material'])->get();
+        return view('admin.projects.index', compact('projects'));
+    }
+    
+    // Crear un nuevo proyecto
+    public function create()
+    {
+        return view('admin.projects.create');
+    }
+    
+    // Guardar un nuevo proyecto
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'status' => 'nullable|string|in:pendiente,en_progreso,completado',
+            'budget' => 'nullable|numeric|min:0'
+        ]);
+        
+        $project = new Project($request->all());
+        $project->token = Project::generateUniqueToken(); // Generar token único
+        $project->save();
+        
+        return redirect()->route('projects.show', $project->id)
+            ->with('success', 'Proyecto creado correctamente');
+    }
+    
+    // Editar un proyecto
+    public function edit(Project $project)
+    {
+        return view('admin.projects.edit', compact('project'));
+    }
+    
+    // Actualizar un proyecto
+    public function update(Request $request, Project $project)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'status' => 'nullable|string|in:pendiente,en_progreso,completado',
+            'budget' => 'nullable|numeric|min:0'
+        ]);
+        
+        $project->update($request->all());
+        
+        // Si el proyecto no tiene token, generamos uno
+        if (!$project->token) {
+            $project->token = Project::generateUniqueToken();
+            $project->save();
+        }
+        
+        return redirect()->route('projects.show', $project->id)
+            ->with('success', 'Proyecto actualizado correctamente');
     }
 
     // Vista detalle de proyecto
@@ -51,7 +107,7 @@ class ProjectController extends Controller
         // Días específicos en los que se ha trabajado
         $dias = ProjectEmployee::where('project_id', $project->id)->pluck('date')->unique();
 
-        return view('projects.show', compact(
+        return view('admin.projects.show', compact(
             'project', 'diasTrabajados', 'horasTotales', 'costoMateriales', 'empleados', 'materiales', 'horasPorEmpleado', 'dias'
         ));
     }

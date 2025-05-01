@@ -19,5 +19,11 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        
+        // Usamos solo AdminUserSeeder que ya contiene los usuarios admin necesarios
+        $this->call(AdminUserSeeder::class);
+        // No usamos UserSeeder para evitar conflictos de correos duplicados
+        // $this->call(UserSeeder::class);
     }
 }

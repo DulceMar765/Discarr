@@ -1,0 +1,1 @@
+{{ $content ?? 'Información del proyecto' }}

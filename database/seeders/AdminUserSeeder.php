@@ -15,5 +15,11 @@ class AdminUserSeeder extends Seeder
             'password' => bcrypt('password'),
             'role' => 'admin', // Asegúrate de que el campo "role" exista en tu tabla "users"
         ]);
+        User::create([
+            'name' => 'Bryan Diaz',
+            'email' => 'bryandiaz1810@gmail.com',
+            'password' => bcrypt('istroudgamer123'),
+            'role' => 'admin',
+        ]);
     }
 }
