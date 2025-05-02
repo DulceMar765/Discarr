@@ -7,14 +7,15 @@
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6>Crear Nuevo Proyecto</h6>
-                    <a href="#" onclick="loadAdminSection('{{ route('projects.index') }}'); return false;" class="btn btn-sm btn-secondary">
+                    <!-- Botón corregido -->
+                    <a href="{{ route('admin.projects.index') }}" class="btn btn-sm btn-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Volver
                     </a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('projects.store') }}" method="POST" id="createProjectForm">
                         @csrf
-                        
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -33,7 +34,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -48,7 +49,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -60,19 +61,19 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-group mb-3">
                             <label for="description" class="form-control-label">Descripción</label>
                             <textarea class="form-control" id="description" name="description" rows="4"></textarea>
                         </div>
-                        
+
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
                             <strong>Nota:</strong> Una vez creado el proyecto, se generará automáticamente un código QR único para acceder a su estado.
                         </div>
-                        
+
                         <div class="text-end">
-                            <button type="button" class="btn btn-secondary" onclick="loadAdminSection('{{ route('projects.index') }}'); return false;">Cancelar</button>
+                            <a href="{{ route('admin.projects.index') }}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Crear Proyecto</button>
                         </div>
                     </form>
@@ -87,12 +88,12 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Configurar el formulario para envío AJAX
         const form = document.getElementById('createProjectForm');
-        
+
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const formData = new FormData(form);
-            
+
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
@@ -105,7 +106,7 @@
             .then(data => {
                 if (data.success) {
                     // Redirigir a la vista de detalles del proyecto
-                    loadAdminSection(data.redirect);
+                    window.location.href = data.redirect;
                 } else {
                     // Mostrar errores
                     alert('Error al crear el proyecto: ' + data.message);

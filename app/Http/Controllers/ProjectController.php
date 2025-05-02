@@ -16,16 +16,16 @@ class ProjectController extends Controller
     // Listado de proyectos
     public function index()
     {
-        $projects = Project::with(['projectEmployees.employee', 'materialProjects.material'])->get();
+        $projects = Project::all(); // Obtén todos los proyectos
         return view('admin.projects.index', compact('projects'));
     }
-    
+
     // Crear un nuevo proyecto
     public function create()
     {
         return view('admin.projects.create');
     }
-    
+
     // Guardar un nuevo proyecto
     public function store(Request $request)
     {
@@ -37,21 +37,21 @@ class ProjectController extends Controller
             'status' => 'nullable|string|in:pendiente,en_progreso,completado',
             'budget' => 'nullable|numeric|min:0'
         ]);
-        
+
         $project = new Project($request->all());
         $project->token = Project::generateUniqueToken(); // Generar token único
         $project->save();
-        
+
         return redirect()->route('projects.show', $project->id)
             ->with('success', 'Proyecto creado correctamente');
     }
-    
+
     // Editar un proyecto
     public function edit(Project $project)
     {
         return view('admin.projects.edit', compact('project'));
     }
-    
+
     // Actualizar un proyecto
     public function update(Request $request, Project $project)
     {
@@ -63,15 +63,15 @@ class ProjectController extends Controller
             'status' => 'nullable|string|in:pendiente,en_progreso,completado',
             'budget' => 'nullable|numeric|min:0'
         ]);
-        
+
         $project->update($request->all());
-        
+
         // Si el proyecto no tiene token, generamos uno
         if (!$project->token) {
             $project->token = Project::generateUniqueToken();
             $project->save();
         }
-        
+
         return redirect()->route('projects.show', $project->id)
             ->with('success', 'Proyecto actualizado correctamente');
     }
@@ -124,4 +124,27 @@ class ProjectController extends Controller
         Storage::disk('local')->put($filename, $csv);
         return response()->download(storage_path('app/'.$filename));
     }
+
+    public function status(Project $project)
+{
+    $diasTrabajados = ProjectEmployee::where('project_id', $project->id)->distinct('date')->count('date');
+    $horasTotales = ProjectEmployee::where('project_id', $project->id)->sum('hours');
+    $materiales = MaterialProject::where('project_id', $project->id)->with('material')->get();
+    $costoMateriales = $materiales->sum(function($item) {
+        return $item->quantity * ($item->material->price ?? 0);
+    });
+
+    $progreso = 0;
+    if ($project->start_date && $project->end_date) {
+        $diasTotales = $project->start_date->diffInDays($project->end_date);
+        if ($diasTotales > 0) {
+            $progreso = min(100, round(($diasTrabajados / $diasTotales) * 100));
+        }
+    }
+
+    return view('projects.status', compact(
+        'project', 'diasTrabajados', 'horasTotales', 'materiales', 'costoMateriales', 'progreso'
+    ));
+}
+
 }

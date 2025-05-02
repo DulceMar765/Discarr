@@ -149,7 +149,7 @@ Route::get('/project/status/{token}', [App\Http\Controllers\ProjectQRController:
 // Rutas protegidas por autenticación y rol "admin"
 Route::middleware(['auth'])->group(function () {
     // Rutas para administración de QR de proyectos y correos electrónicos
-    
+
     // Rutas para envío de correos de proyectos
     Route::get('/admin/projects/{project}/email', [App\Http\Controllers\ProjectMailController::class, 'showSendForm'])->name('admin.projects.email.form');
     Route::post('/admin/projects/{project}/email/send', [App\Http\Controllers\ProjectMailController::class, 'sendProjectStatus'])->name('admin.projects.email.send');
@@ -157,7 +157,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/project/{projectId}/qr', [App\Http\Controllers\ProjectQRController::class, 'generateQR'])->name('project.qr.generate');
     Route::get('/project/{projectId}/qr/download', [App\Http\Controllers\ProjectQRController::class, 'downloadQR'])->name('project.qr.download');
     Route::post('/project/{projectId}/regenerate-token', [App\Http\Controllers\ProjectQRController::class, 'regenerateToken'])->name('project.regenerate-token');
-    
+
     Route::get('/appointments', function () {
         if (Auth::user()->role !== 'admin') {
             abort(403, 'No tienes permisos para acceder a esta sección.');

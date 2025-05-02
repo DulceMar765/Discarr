@@ -11,7 +11,7 @@
                 <div class="col-md-8">
                     <h2 class="text-primary">{{ $project->name }}</h2>
                     <p class="text-muted">{{ $project->description }}</p>
-                    
+
                     <div class="d-flex align-items-center mb-3">
                         <span class="badge {{ $project->status == 'completado' ? 'bg-success' : ($project->status == 'en_progreso' ? 'bg-warning' : 'bg-secondary') }} me-2">
                             {{ ucfirst(str_replace('_', ' ', $project->status)) }}
@@ -21,7 +21,7 @@
                         </div>
                         <span class="ms-2">{{ $progreso }}%</span>
                     </div>
-                    
+
                     <div class="row mt-4">
                         <div class="col-md-6">
                             <div class="card bg-light mb-3">
@@ -70,7 +70,7 @@
                     </div>
                 </div>
             </div>
-            
+
             @if($materiales->count() > 0)
             <div class="card mt-4">
                 <div class="card-header bg-light">
@@ -108,7 +108,7 @@
                 </div>
             </div>
             @endif
-            
+
             <div class="text-center mt-4">
                 <p class="text-muted">Última actualización: {{ $project->updated_at->format('d/m/Y H:i') }}</p>
                 <img src="{{ asset('img/logo.png') }}" alt="Logo Discarr" height="50">

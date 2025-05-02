@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Administración</title>
+    <title>@yield('title', 'Panel de Administración')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Bootstrap CSS -->
@@ -118,6 +118,9 @@
         <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('material.index') }}'); return false;">
             <i class="bi bi-box-seam"></i> Material
         </a>
+        <a class="nav-link" href="{{ route('admin.projects.index') }}">
+            <i class="bi bi-folder-fill"></i> Proyectos
+        </a>
 
         <div class="logout mt-auto">
             <form action="{{ route('logout') }}" method="POST">
@@ -131,7 +134,11 @@
 
     <!-- Main Content -->
     <div class="main-content" id="admin-content">
-        @yield('main-content')
+        @hasSection('content')
+            @yield('content') <!-- Renderiza contenido estático -->
+        @else
+            @yield('main-content') <!-- Renderiza contenido dinámico -->
+        @endif
     </div>
 
     <!-- Bootstrap y JQuery -->
