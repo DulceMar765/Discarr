@@ -84,6 +84,16 @@
             transform: scale(1.05);
         }
 
+        .btn-link {
+            color: #fff !important; /* Asegura que el texto sea blanco */
+            text-decoration: underline; /* Subraya el texto */
+        }
+
+        .btn-link:hover {
+            color: #e67e00; /* Cambia el color al pasar el mouse */
+            text-decoration: underline; /* Mantiene el subrayado */
+        }
+
         .footer {
             background-color: rgba(18, 18, 18, 0.95);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -152,8 +162,19 @@
                     <li class="nav-item"><a class="nav-link" href="/appointments/create">Reservaciones</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contacto">Contacto</a></li>
                 </ul>
-                <a href="/login" class="btn btn-login ms-3">Iniciar Sesión</a>
-
+                @if(Auth::check())
+                    <!-- Botón de Registrarse -->
+                    <a href="{{ route('register') }}" class="btn btn-register ms-3">Registrarse</a>
+                    <!-- Botón de Cerrar Sesión -->
+                    <form method="POST" action="{{ route('logout') }}" class="d-inline ms-3">
+                        @csrf
+                        <button type="submit" class="btn btn-link text-white text-decoration-underline">Cerrar Sesión</button>
+                    </form>
+                @else
+                    <!-- Botones de Iniciar Sesión y Registrarse -->
+                    <a href="/login" class="btn btn-login ms-3">Iniciar Sesión</a>
+                    <a href="{{ route('register') }}" class="btn btn-register ms-3">Registrarse</a>
+                @endif
             </div>
         </div>
     </nav>

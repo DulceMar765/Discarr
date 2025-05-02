@@ -13,6 +13,7 @@ use App\Http\Controllers\ProjectCostController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 Route::get('/', function () {
     return view('home');
@@ -37,25 +38,8 @@ Route::post('/login', function (Illuminate\Http\Request $request) {
     return back()->with('error', 'Credenciales incorrectas.')->withInput();
 });
 
-// Registro manual
-Route::post('/register', function (Illuminate\Http\Request $request) {
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:8|confirmed',
-    ]);
-
-    $user = \App\Models\User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => bcrypt($request->password),
-        'role' => 'user', // Todos los usuarios registrados tendrán el rol "user"
-    ]);
-
-    Auth::login($user);
-
-    return redirect('/'); // Redirige a la página de inicio después del registro
-});
+Route::get('register', [RegisteredUserController::class, 'create'])->name('register'); // Permitir acceso a todos
+Route::post('register', [RegisteredUserController::class, 'store']);
 
 // Ruta protegida para admin
 Route::get('/admin', function () {
