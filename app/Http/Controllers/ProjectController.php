@@ -10,12 +10,23 @@ use App\Models\MaterialProject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
     // Listado de proyectos
     public function index()
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         $projects = Project::all(); // Obtén todos los proyectos
         return view('admin.projects.index', compact('projects'));
     }
@@ -23,12 +34,32 @@ class ProjectController extends Controller
     // Crear un nuevo proyecto
     public function create()
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         return view('admin.projects.create');
     }
 
     // Guardar un nuevo proyecto
     public function store(Request $request)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -49,12 +80,32 @@ class ProjectController extends Controller
     // Editar un proyecto
     public function edit(Project $project)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         return view('admin.projects.edit', compact('project'));
     }
 
     // Actualizar un proyecto
     public function update(Request $request, Project $project)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -79,6 +130,16 @@ class ProjectController extends Controller
     // Vista detalle de proyecto
     public function show(Project $project)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         // Barra de progreso automatizada: porcentaje de días trabajados sobre duración estimada (si existe)
         $diasTrabajados = ProjectEmployee::where('project_id', $project->id)->distinct('date')->count('date');
 
@@ -115,6 +176,16 @@ class ProjectController extends Controller
     // Exportar a CSV
     public function exportCsv(Project $project)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         $rows = ProjectEmployee::where('project_id', $project->id)->with('employee')->get();
         $csv = "Empleado,Fecha,Horas\n";
         foreach ($rows as $row) {
@@ -126,8 +197,9 @@ class ProjectController extends Controller
     }
 
     public function status(Project $project)
-{
-    $diasTrabajados = ProjectEmployee::where('project_id', $project->id)->distinct('date')->count('date');
+    {
+        // Este método muestra el estado público del proyecto, no requiere autenticación
+        $diasTrabajados = ProjectEmployee::where('project_id', $project->id)->distinct('date')->count('date');
     $horasTotales = ProjectEmployee::where('project_id', $project->id)->sum('hours');
     $materiales = MaterialProject::where('project_id', $project->id)->with('material')->get();
     $costoMateriales = $materiales->sum(function($item) {

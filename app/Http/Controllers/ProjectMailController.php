@@ -7,6 +7,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectMailController extends Controller
 {
@@ -15,6 +16,16 @@ class ProjectMailController extends Controller
      */
     public function sendProjectStatus(Request $request, $projectId)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         // Validar los datos del formulario
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -65,6 +76,16 @@ class ProjectMailController extends Controller
      */
     public function showSendForm($projectId)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         $project = Project::findOrFail($projectId);
         return view('admin.projects.send-email', compact('project'));
     }
@@ -74,6 +95,16 @@ class ProjectMailController extends Controller
      */
     public function sendBulkEmails(Request $request, $projectId)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         // Validar los datos del formulario
         $validator = Validator::make($request->all(), [
             'emails' => 'required|array',

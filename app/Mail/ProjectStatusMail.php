@@ -93,26 +93,32 @@ class ProjectStatusMail extends Mailable
         // Generar la URL del QR
         $url = route('project.status', ['token' => $this->project->token]);
         
-        // Crear el contenido del correo en texto plano
-        $textContent = "";
-        $textContent .= "{$this->options['title']}: {$this->project->name}\n\n";
-        $textContent .= "{$this->options['message']}\n\n";
-        $textContent .= "Detalles del Proyecto:\n";
-        $textContent .= "-------------------\n";
-        $textContent .= "Nombre: {$this->project->name}\n";
-        $textContent .= "Descripción: {$this->project->description}\n";
-        $textContent .= "Estado: {$this->project->status}\n";
-        $textContent .= "Progreso: {$progreso}%\n";
-        $textContent .= "Días trabajados: {$diasTrabajados}\n";
-        $textContent .= "Horas totales: {$horasTotales}\n";
-        $textContent .= "Costo de materiales: $" . number_format($costoMateriales, 2) . "\n\n";
-        $textContent .= "Para ver el estado completo del proyecto, escanea el código QR adjunto o visita:\n";
-        $textContent .= "{$url}\n\n";
-        $textContent .= "Atentamente,\n{$this->options['company_name']}\n";
+        // Configurar el correo
+        $mail = $this->subject($this->options['title'] . ': ' . $this->project->name)
+                     ->text('emails.project-status-plain', [
+                         'project' => $this->project,
+                         'title' => $this->options['title'],
+                         'message' => $this->options['message'],
+                         'additional_info' => $this->options['additional_info'],
+                         'company_name' => $this->options['company_name'],
+                         'diasTrabajados' => $diasTrabajados,
+                         'horasTotales' => $horasTotales,
+                         'costoMateriales' => $costoMateriales,
+                         'progreso' => $progreso,
+                         'url' => $url
+                     ]);
         
         // Generar el QR y adjuntarlo
         if ($this->options['attach_qr']) {
-            $qrCode = $this->generateQR($url);
+            // Generar QR
+            $renderer = new ImageRenderer(
+                new RendererStyle(300),
+                new SvgImageBackEnd()
+            );
+            $writer = new Writer($renderer);
+            $qrCode = $writer->writeString($url);
+            
+            // Guardar temporalmente
             $filename = 'project_qr_' . $this->project->id . '.svg';
             $tempPath = storage_path('app/temp');
             if (!file_exists($tempPath)) {
@@ -121,25 +127,19 @@ class ProjectStatusMail extends Mailable
             $filePath = $tempPath . '/' . $filename;
             file_put_contents($filePath, $qrCode);
             
-            $this->attach($filePath, [
-                'as' => $filename,
+            // Adjuntar al correo
+            $mail->attach($filePath, [
+                'as' => 'codigo_qr_proyecto.svg',
                 'mime' => 'image/svg+xml',
             ]);
         }
         
-        // Adjuntar PDF si es necesario
+        // Adjuntar PDF si es necesario (implementación futura)
         if ($this->options['attach_pdf']) {
-            $pdfPath = $this->generateProjectPDF();
-            if ($pdfPath) {
-                $this->attach($pdfPath, [
-                    'as' => 'proyecto_' . $this->project->id . '.pdf',
-                    'mime' => 'application/pdf',
-                ]);
-            }
+            // Lógica para generar y adjuntar PDF
         }
         
-        return $this->subject($this->options['title'] . ': ' . $this->project->name)
-                    ->text('emails.project-status-plain', ['content' => $textContent]);
+        return $mail;
     }
     
     /**

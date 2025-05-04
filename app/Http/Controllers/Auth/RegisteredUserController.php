@@ -33,13 +33,17 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'phone' => ['required', 'string', 'max:20'],
+            'address' => ['required', 'string'],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Asignar el rol "user" por defecto
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'role' => 'cliente', // Asignar el rol "cliente" por defecto
         ]);
 
         Auth::login($user);

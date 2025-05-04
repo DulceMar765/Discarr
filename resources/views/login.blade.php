@@ -24,6 +24,7 @@
             <button type="submit" class="btn btn-primary w-100">Entrar</button>
         </form>
         <div class="mt-3 text-center">
+            <p>¿No tienes una cuenta? <a href="{{ route('register') }}">Regístrate aquí</a></p>
             <small>Usuario demo: <strong>admin@example.com</strong><br>Contraseña: <strong>password</strong></small>
         </div>
     </div>

@@ -6,6 +6,9 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ProjectStatusMail;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
@@ -22,6 +25,16 @@ class ProjectQRController extends Controller
      */
     public function generateQR($projectId)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         $project = Project::findOrFail($projectId);
         
         // Si el proyecto no tiene token, generamos uno
@@ -100,6 +113,16 @@ class ProjectQRController extends Controller
      */
     public function downloadQR($projectId)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         $project = Project::findOrFail($projectId);
         
         // Si el proyecto no tiene token, generamos uno
@@ -126,10 +149,78 @@ class ProjectQRController extends Controller
     }
     
     /**
+     * Manejar solicitudes de actualización por correo electrónico
+     */
+    public function requestUpdate(Request $request, $token)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+        
+        $project = Project::where('token', $token)->firstOrFail();
+        
+        // Obtener datos relevantes del proyecto
+        $diasTrabajados = DB::table('project_employees')
+            ->where('project_id', $project->id)
+            ->distinct('date')
+            ->count('date');
+            
+        $horasTotales = DB::table('project_employees')
+            ->where('project_id', $project->id)
+            ->sum('hours');
+            
+        $materiales = DB::table('material_projects')
+            ->where('project_id', $project->id)
+            ->join('materials', 'material_projects.material_id', '=', 'materials.id')
+            ->select('materials.name', 'materials.price', 'material_projects.quantity')
+            ->get();
+            
+        $costoMateriales = $materiales->sum(function($item) {
+            return $item->quantity * ($item->price ?? 0);
+        });
+        
+        // Calcular progreso del proyecto
+        $progreso = 0;
+        if ($project->start_date && $project->end_date) {
+            $diasTotales = $project->start_date->diffInDays($project->end_date);
+            if ($diasTotales > 0) {
+                $progreso = min(100, round(($diasTrabajados / $diasTotales) * 100));
+            }
+        }
+        
+        // URL para acceder al estado del proyecto
+        $url = route('project.status', ['token' => $project->token]);
+        
+        try {
+            // Enviar correo con el estado del proyecto
+            Mail::to($request->email)->send(new ProjectStatusMail($project, [
+                'title' => 'Estado del Proyecto',
+                'message' => 'Has solicitado información actualizada sobre el proyecto. Aquí tienes los detalles:',
+                'additional_info' => 'Si tienes alguna pregunta, por favor contacta directamente con nuestro equipo.',
+                'attach_qr' => true
+            ]));
+            
+            return redirect()->back()->with('success', 'Se ha enviado un correo con la información actualizada del proyecto.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'No se pudo enviar el correo. Por favor, inténtalo de nuevo más tarde.');
+        }
+    }
+    
+    /**
      * Regenerar el token de un proyecto y devolver el nuevo QR
      */
     public function regenerateToken($projectId)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+        
         $project = Project::findOrFail($projectId);
         
         // Generar un nuevo token único

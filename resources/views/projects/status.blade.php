@@ -49,6 +49,27 @@
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column justify-content-center align-items-center">
                             <div class="text-center mb-3">
+                                <h5 class="card-title">Recibir actualizaciones</h5>
+                                <p class="card-text">Ingresa tu correo para recibir actualizaciones sobre este proyecto</p>
+                                <form action="{{ route('project.request.update', ['token' => $project->token]) }}" method="POST" class="mt-3">
+                                    @csrf
+                                    <div class="input-group mb-3">
+                                        <input type="email" name="email" class="form-control" placeholder="Tu correo electrónico" required>
+                                        <button class="btn btn-primary" type="submit">Solicitar actualización</button>
+                                    </div>
+                                    @if(session('success'))
+                                        <div class="alert alert-success mt-2">
+                                            {{ session('success') }}
+                                        </div>
+                                    @endif
+                                    @if(session('error'))
+                                        <div class="alert alert-danger mt-2">
+                                            {{ session('error') }}
+                                        </div>
+                                    @endif
+                                </form>
+                            </div>
+                            <div class="text-center mb-3">
                                 <i class="fas fa-chart-line fa-4x text-primary mb-3"></i>
                                 <h3>Resumen</h3>
                             </div>

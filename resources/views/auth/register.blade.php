@@ -23,6 +23,14 @@
                     <label for="password_confirmation" class="form-label">Confirmar Contraseña</label>
                     <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirma tu contraseña" required>
                 </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Teléfono</label>
+                    <input type="text" class="form-control" id="phone" name="phone" placeholder="Ingresa tu número de teléfono" required>
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Dirección</label>
+                    <textarea class="form-control" id="address" name="address" placeholder="Ingresa tu dirección completa" rows="3" required></textarea>
+                </div>
                 <button type="submit" class="btn btn-primary w-100">Registrarse</button>
             </form>
             <div class="text-center mt-3">
