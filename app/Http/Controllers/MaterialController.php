@@ -32,7 +32,7 @@ class MaterialController extends Controller
             'price' => 'required|numeric|min:0',
         ]);
         Material::create($request->all());
-        return redirect()->route('materials.index')->with('success', 'Material creado correctamente.');
+        return redirect()->route('admin.material.index')->with('success', 'Material creado correctamente.');
     }
 
     // Mostrar detalle de material (incluye uso por proyecto)

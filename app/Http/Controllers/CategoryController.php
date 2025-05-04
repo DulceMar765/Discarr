@@ -13,15 +13,15 @@ class CategoryController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-   {
-    $categories = Category::all();
+    {
+        $categories = Category::all();
 
-    if (request()->ajax()) {
-        return view('admin.categories.index', compact('categories'))->render();
+        if (request()->ajax()) {
+            return view('admin.categories.index', compact('categories'))->render();
+        }
+
+        return view('admin.categories.index', compact('categories')); // Corregido para mostrar la vista correcta
     }
-
-    return view('admin.dashboard', compact('categories')); // fallback si no es AJAX
-   }
 
 
     /**
@@ -37,7 +37,7 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        Categorie::create($request->validated());
+        Category::create($request->validated());
         return redirect()->route('categories.index')->with('success', 'Categoría creada correctamente.');
     }
 

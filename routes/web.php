@@ -32,7 +32,7 @@ Route::post('/login', function (Illuminate\Http\Request $request) {
 
         // Redirige según el rol del usuario
         if (Auth::user()->role === 'admin') {
-            return redirect('/admin');
+            return redirect()->route('admin.dashboard');
         }
         return redirect('/'); // Redirige a la página de inicio para usuarios normales
     }
@@ -45,23 +45,12 @@ Route::post('register', [RegisteredUserController::class, 'store']);
 
 // Ruta para admin
 Route::get('/admin', function () {
-    // Verificar si el usuario está autenticado
-    if (!Auth::check()) {
-        return redirect('/login');
-    }
-    
-    // Verificar si el usuario es administrador
-    if (Auth::user()->role !== 'admin') {
-        abort(403, 'No tienes permisos para acceder a esta sección.');
-    }
-    
+    // La verificación de roles se hará en el controlador
     $folders = [
         'customer', 'material', 'categories', 'supplier', 'employee', 'projects', 'appointments'
     ];
     return view('admin.index', compact('folders'));
 })->name('admin.dashboard');
-
-
 
 // Páginas estáticas
 Route::get('/servicios', function () {
@@ -102,11 +91,51 @@ Route::post('/appointments', [AppointmentsController::class, 'store'])->name('ap
 Route::get('/employee', [EmployeeController::class, 'index'])->name('employee.index');
 Route::get('/supplier', [SupplierController::class, 'index'])->name('supplier.index');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+
+// Rutas para la sección de reservaciones
+Route::resource('appointments', AppointmentsController::class);
+
+// Rutas para la sección de reservaciones en el panel de administración
+Route::prefix('admin/appointments')->name('admin.appointments.')->group(function () {
+    Route::get('/', [AppointmentsController::class, 'index'])->name('index');
+    Route::get('/create', [AppointmentsController::class, 'create'])->name('create');
+    Route::post('/', [AppointmentsController::class, 'store'])->name('store');
+    Route::get('/{appointment}/edit', [AppointmentsController::class, 'edit'])->name('edit');
+    Route::put('/{appointment}', [AppointmentsController::class, 'update'])->name('update');
+    Route::delete('/{appointment}', [AppointmentsController::class, 'destroy'])->name('destroy');
+    Route::get('/availability', [AppointmentsController::class, 'availability'])->name('availability');
+    Route::get('/calendar-data', [AppointmentsController::class, 'calendarData'])->name('calendar-data');
+    Route::get('/day-config/{date}', [AppointmentsController::class, 'getDayConfig'])->name('day-config');
+    Route::post('/save-availability', [AppointmentsController::class, 'saveAvailability'])->name('save-availability');
+    Route::get('/available-slots', [AppointmentsController::class, 'getAvailableSlots'])->name('available-slots');
+});
+
+// Rutas completas para la sección de clientes
+Route::prefix('admin/customer')->name('admin.customer.')->group(function () {
+    Route::get('/', [CustomerController::class, 'index'])->name('index');
+    Route::get('/create', [CustomerController::class, 'create'])->name('create');
+    Route::post('/', [CustomerController::class, 'store'])->name('store');
+    Route::get('/{customer}/edit', [CustomerController::class, 'edit'])->name('edit');
+    Route::put('/{customer}', [CustomerController::class, 'update'])->name('update');
+    Route::delete('/{customer}', [CustomerController::class, 'destroy'])->name('destroy');
+});
+
+// Rutas completas para la sección de materiales
+Route::prefix('admin/material')->name('admin.material.')->group(function () {
+    Route::get('/', [MaterialController::class, 'index'])->name('index');
+    Route::get('/create', [MaterialController::class, 'create'])->name('create');
+    Route::post('/', [MaterialController::class, 'store'])->name('store');
+    Route::get('/{material}', [MaterialController::class, 'show'])->name('show');
+    Route::get('/{material}/edit', [MaterialController::class, 'edit'])->name('edit');
+    Route::put('/{material}', [MaterialController::class, 'update'])->name('update');
+    Route::delete('/{material}', [MaterialController::class, 'destroy'])->name('destroy');
+});
+
 Route::get('/admin/projects', [ProjectController::class, 'index'])->name('admin.projects.index');
 
 // Rutas para QR de proyectos (públicas)
 Route::get('/project/status/{token}', [ProjectQRController::class, 'showProjectStatus'])->name('project.status');
-Route::post('/project/request-update/{token}', [ProjectQRController::class, 'requestUpdate'])->name('project.request.update');
 
 // Rutas para administración de QR de proyectos
 Route::get('/project/{projectId}/qr', [ProjectQRController::class, 'generateQR'])->name('project.qr.generate');

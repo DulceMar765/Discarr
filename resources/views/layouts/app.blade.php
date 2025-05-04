@@ -163,8 +163,12 @@
                     <li class="nav-item"><a class="nav-link" href="/contacto">Contacto</a></li>
                 </ul>
                 @if(Auth::check())
-                    <!-- Botón de Registrarse -->
-                    <a href="{{ route('register') }}" class="btn btn-register ms-3">Registrarse</a>
+                    @if(Auth::user()->role === 'admin')
+                        <!-- Opciones para administradores -->
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-login ms-3">Panel Admin</a>
+                    @endif
+                    <!-- Opciones para usuarios autenticados -->
+                    <a href="{{ route('profile.edit') }}" class="btn btn-register ms-3">Mi Perfil</a>
                     <!-- Botón de Cerrar Sesión -->
                     <form method="POST" action="{{ route('logout') }}" class="d-inline ms-3">
                         @csrf

@@ -11,14 +11,14 @@ class CustomerController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-   {
-    $customers = Customer::all();
+    {
+        $customers = Customer::all();
 
-    if (request()->ajax()) {
-        return view('admin.customers.index', compact('customers'))->render(); // Usa la ruta correcta a tu vista
-    }
+        if (request()->ajax()) {
+            return view('admin.customer.index', compact('customers'))->render(); // Corregido a customer (singular)
+        }
 
-    return view('admin.dashboard', compact('customers')); // fallback si se accede sin AJAX
+        return view('admin.customer.index', compact('customers')); // Corregido para mostrar la vista correcta
     }
 
     /**
@@ -27,7 +27,7 @@ class CustomerController extends Controller
     public function create()
     {
         // Muestra el formulario para crear un cliente
-        return view('customers.create');
+        return view('admin.customer.create');
     }
 
     /**

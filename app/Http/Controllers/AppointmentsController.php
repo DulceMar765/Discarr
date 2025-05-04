@@ -6,6 +6,8 @@ use App\Models\Appointment; // Asegúrate que el archivo sea appointments.php pe
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CalendarDay; // Corregido: Se usa calendar_days en lugar de CalendarDay
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AppointmentsController extends Controller
 {
@@ -13,9 +15,14 @@ class AppointmentsController extends Controller
     public function index()
     {
         // Obtén todas las citas con las relaciones necesarias
-        $appointments = Appointment::with(['user', 'calendarDay'])->get();
-
-        // Retorna la vista con las citas
+        $appointments = Appointment::with(['user', 'calendarDay'])->orderBy('created_at', 'desc')->get();
+        
+        // Si es una solicitud AJAX (desde el panel de administración)
+        if (request()->ajax()) {
+            return view('admin.appointments.index', compact('appointments'))->render();
+        }
+        
+        // Vista normal para usuarios
         return view('appointments.index', compact('appointments'));
     }
 
@@ -264,4 +271,309 @@ class AppointmentsController extends Controller
         return redirect()->route('appointments.index')->with('success', 'Días pasados eliminados correctamente.');
     }
 
+    /*
+     * Métodos para el panel de administración
+     */
+    
+    // Mostrar formulario de edición de cita
+    public function edit($id)
+    {
+        // Buscar la cita o devolver 404 si no existe
+        $appointment = Appointment::with(['calendarDay'])->findOrFail($id);
+        
+        // Obtener los horarios disponibles para la fecha seleccionada
+        $calendarDay = CalendarDay::where('date', $appointment->calendarDay->date)->first();
+        $availableSlots = [];
+        
+        // Si hay un día de calendario, obtener los horarios disponibles
+        if ($calendarDay) {
+            // Generar horarios estándar si no hay horarios específicos
+            $availableSlots = $calendarDay->available_slots ?? $this->generateDefaultTimeSlots();
+            
+            // Asegurarse de incluir el horario actual de la cita
+            if (!in_array($appointment->time_slot, $availableSlots)) {
+                $availableSlots[] = $appointment->time_slot;
+                sort($availableSlots);
+            }
+        } else {
+            // Si no hay día de calendario, usar horarios estándar
+            $availableSlots = $this->generateDefaultTimeSlots();
+        }
+        
+        // Si es una solicitud AJAX (desde el panel de administración)
+        if (request()->ajax()) {
+            return view('admin.appointments.edit', compact('appointment', 'availableSlots'))->render();
+        }
+        
+        // Vista normal para usuarios
+        return view('appointments.edit', compact('appointment', 'availableSlots'));
+    }
+    
+    // Actualizar una cita
+    public function update(Request $request, $id)
+    {
+        // Validar los datos del formulario
+        $validator = Validator::make($request->all(), [
+            'calendar_day' => 'required|date',
+            'time_slot' => 'required|string',
+            'requester_name' => 'required|string|max:255',
+            'requester_email' => 'required|email|max:255',
+            'requester_phone' => 'required|string|max:20',
+            'description' => 'required|string',
+            'status' => 'required|in:pending,confirmed,cancelled',
+            'admin_notes' => 'nullable|string',
+        ]);
+        
+        // Si la validación falla, devolver errores
+        if ($validator->fails()) {
+            if (request()->ajax()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            return back()->withErrors($validator)->withInput();
+        }
+        
+        // Buscar la cita o devolver 404 si no existe
+        $appointment = Appointment::findOrFail($id);
+        
+        // Verificar si la fecha ha cambiado
+        $oldCalendarDayId = $appointment->calendar_day_id;
+        $newCalendarDay = CalendarDay::firstOrCreate(
+            ['date' => $request->calendar_day],
+            [
+                'availability_status' => 'green',
+                'booked_slots' => 0,
+                'total_slots' => 10,
+            ]
+        );
+        
+        // Actualizar la cita con los nuevos datos
+        $appointment->calendar_day_id = $newCalendarDay->id;
+        $appointment->time_slot = $request->time_slot;
+        $appointment->requester_name = $request->requester_name;
+        $appointment->requester_email = $request->requester_email;
+        $appointment->requester_phone = $request->requester_phone;
+        $appointment->description = $request->description;
+        $appointment->status = $request->status;
+        $appointment->admin_notes = $request->admin_notes;
+        $appointment->save();
+        
+        // Actualizar los contadores de citas reservadas
+        if ($oldCalendarDayId != $newCalendarDay->id) {
+            $this->updateBookedSlots($oldCalendarDayId);
+        }
+        $this->updateBookedSlots($newCalendarDay->id);
+        
+        // Si es una solicitud AJAX (desde el panel de administración)
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Reservación actualizada correctamente']);
+        }
+        
+        // Redireccionar a la vista de citas para usuarios normales
+        return redirect()->route('appointments.index')->with('success', 'Reservación actualizada correctamente');
+    }
+    
+    // Eliminar una cita
+    public function destroy($id)
+    {
+        // Buscar la cita o devolver 404 si no existe
+        $appointment = Appointment::findOrFail($id);
+        $calendarDayId = $appointment->calendar_day_id;
+        
+        // Eliminar la cita
+        $appointment->delete();
+        
+        // Actualizar el contador de citas reservadas
+        $this->updateBookedSlots($calendarDayId);
+        
+        // Si es una solicitud AJAX (desde el panel de administración)
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Reservación eliminada correctamente']);
+        }
+        
+        // Redireccionar a la vista de citas para usuarios normales
+        return redirect()->route('appointments.index')->with('success', 'Reservación eliminada correctamente');
+    }
+    
+    // Mostrar la vista de gestión de disponibilidad
+    public function availability()
+    {
+        // Si es una solicitud AJAX, devolver solo la vista parcial
+        if (request()->ajax()) {
+            return view('admin.appointments.availability')->render();
+        }
+        
+        // De lo contrario, devolver la vista completa
+        return view('admin.appointments.availability');
+    }
+    
+    // Obtener datos del calendario para mostrar en la vista de disponibilidad
+    public function calendarData()
+    {
+        // Obtener todos los días del calendario para los próximos 90 días
+        $startDate = now()->format('Y-m-d');
+        $endDate = now()->addDays(90)->format('Y-m-d');
+        
+        $calendarDays = CalendarDay::whereBetween('date', [$startDate, $endDate])->get();
+        
+        // Formatear los datos para el calendario
+        $events = [];
+        
+        foreach ($calendarDays as $day) {
+            // Determinar el color según el estado
+            $color = '';
+            $title = '';
+            
+            switch ($day->availability_status) {
+                case 'green':
+                    $color = '#28a745';
+                    $title = 'Disponible';
+                    break;
+                case 'yellow':
+                    $color = '#ffc107';
+                    $title = 'Poca disponibilidad';
+                    break;
+                case 'red':
+                    $color = '#dc3545';
+                    $title = 'Sin disponibilidad';
+                    break;
+                case 'purple':
+                    $color = '#b39ddb';
+                    $title = 'Día sin servicio';
+                    break;
+                default:
+                    $color = '#adb5bd';
+                    $title = 'No configurado';
+            }
+            
+            // Añadir el evento al array
+            $events[] = [
+                'title' => $title,
+                'start' => $day->date,
+                'backgroundColor' => $color,
+                'borderColor' => $color,
+                'textColor' => '#fff',
+                'allDay' => true,
+            ];
+        }
+        
+        return response()->json($events);
+    }
+    
+    // Obtener la configuración de un día específico
+    public function getDayConfig($date)
+    {
+        // Buscar el día en la base de datos
+        $calendarDay = CalendarDay::where('date', $date)->first();
+        
+        if ($calendarDay) {
+            // Determinar el estado del día
+            $status = 'available';
+            
+            if ($calendarDay->availability_status == 'red') {
+                $status = 'unavailable';
+            } elseif ($calendarDay->availability_status == 'purple') {
+                $status = 'holiday';
+            }
+            
+            // Obtener los horarios disponibles
+            $slots = $calendarDay->available_slots ?? $this->generateDefaultTimeSlots();
+            
+            return response()->json([
+                'status' => $status,
+                'max_appointments' => $calendarDay->total_slots,
+                'slots' => $slots,
+            ]);
+        }
+        
+        // Si no existe, devolver valores predeterminados
+        return response()->json([
+            'status' => 'available',
+            'max_appointments' => 10,
+            'slots' => $this->generateDefaultTimeSlots(),
+        ]);
+    }
+    
+    // Guardar la configuración de disponibilidad
+    public function saveAvailability(Request $request)
+    {
+        // Validar los datos del formulario
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
+            'status' => 'required|in:available,unavailable,holiday',
+            'max_appointments' => 'required_if:status,available|integer|min:1',
+            'slots' => 'required_if:status,available|array',
+            'slots.*' => 'required_if:status,available|string',
+        ]);
+        
+        // Si la validación falla, devolver errores
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()->first()], 422);
+        }
+        
+        // Buscar o crear el día en la base de datos
+        $calendarDay = CalendarDay::firstOrCreate(
+            ['date' => $request->date],
+            [
+                'availability_status' => 'green',
+                'booked_slots' => 0,
+                'total_slots' => 10,
+            ]
+        );
+        
+        // Actualizar el estado del día
+        switch ($request->status) {
+            case 'available':
+                $calendarDay->availability_status = 'green';
+                $calendarDay->total_slots = $request->max_appointments;
+                $calendarDay->available_slots = $request->slots;
+                break;
+            case 'unavailable':
+                $calendarDay->availability_status = 'red';
+                break;
+            case 'holiday':
+                $calendarDay->availability_status = 'purple';
+                break;
+        }
+        
+        // Guardar los cambios
+        $calendarDay->save();
+        
+        // Devolver respuesta exitosa
+        return response()->json(['success' => true, 'message' => 'Configuración guardada correctamente']);
+    }
+    
+    // Obtener los horarios disponibles para una fecha específica
+    public function getAvailableSlots(Request $request)
+    {
+        // Validar la fecha
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
+        ]);
+        
+        // Si la validación falla, devolver errores
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()->first()], 422);
+        }
+        
+        // Buscar el día en la base de datos
+        $calendarDay = CalendarDay::where('date', $request->date)->first();
+        
+        if ($calendarDay && $calendarDay->availability_status != 'red' && $calendarDay->availability_status != 'purple') {
+            // Obtener los horarios disponibles
+            $slots = $calendarDay->available_slots ?? $this->generateDefaultTimeSlots();
+            
+            return response()->json(['success' => true, 'slots' => $slots]);
+        }
+        
+        // Si no existe o no está disponible, devolver horarios predeterminados
+        return response()->json(['success' => true, 'slots' => $this->generateDefaultTimeSlots()]);
+    }
+    
+    // Generar horarios predeterminados
+    private function generateDefaultTimeSlots()
+    {
+        return [
+            '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'
+        ];
+    }
 }

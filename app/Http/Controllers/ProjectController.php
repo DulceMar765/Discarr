@@ -69,7 +69,16 @@ class ProjectController extends Controller
             'budget' => 'nullable|numeric|min:0'
         ]);
 
-        $project = new Project($request->all());
+        // Crear el proyecto con campos específicos
+        $project = new Project([
+            'name' => $request->name,
+            'description' => $request->description,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'status' => $request->status,
+            'budget' => $request->budget ? $request->budget : null,
+        ]);
+        
         $project->token = Project::generateUniqueToken(); // Generar token único
         $project->save();
 

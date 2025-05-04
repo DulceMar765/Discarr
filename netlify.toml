@@ -17,8 +17,8 @@
   force = true
 
 [build.environment]
-  PHP_VERSION = "8.2"
-  NODE_VERSION = "18"
+  PHP_VERSION = "8.3"
+  NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
 
 # Configuración específica para Laravel

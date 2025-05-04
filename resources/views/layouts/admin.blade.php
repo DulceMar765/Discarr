@@ -118,6 +118,9 @@
         <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('material.index') }}'); return false;">
             <i class="bi bi-box-seam"></i> Material
         </a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('/admin/appointments'); return false;">
+            <i class="bi bi-calendar-check"></i> Reservaciones
+        </a>
         <a class="nav-link" href="{{ route('admin.projects.index') }}">
             <i class="bi bi-folder-fill"></i> Proyectos
         </a>
