@@ -14,6 +14,7 @@ use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProjectMailController;
 use App\Http\Controllers\ProjectQRController;
+use App\Http\Controllers\PortfolioController;
 
 // Página principal
 Route::get('/', function () {
@@ -146,6 +147,16 @@ Route::post('/project/{projectId}/regenerate-token', [ProjectQRController::class
 Route::get('/admin/projects/{project}/email', [ProjectMailController::class, 'showSendForm'])->name('admin.projects.email.form');
 Route::post('/admin/projects/{project}/email/send', [ProjectMailController::class, 'sendProjectStatus'])->name('admin.projects.email.send');
 Route::post('/admin/projects/{project}/email/bulk', [ProjectMailController::class, 'sendBulkEmails'])->name('admin.projects.email.bulk');
+
+// Rutas para portafolio
+Route::get('/portafolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+Route::middleware('auth')->group(function () {
+    Route::get('/portafolio/create', [PortfolioController::class, 'create'])->name('portfolio.create');
+    Route::post('/portafolio', [PortfolioController::class, 'store'])->name('portfolio.store');
+    Route::delete('/portafolio/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolio.destroy');
+    Route::get('/portafolio/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('portfolio.edit');
+    Route::put('/portafolio/{portfolio}', [PortfolioController::class, 'update'])->name('portfolio.update');
+});
 
 // Rutas de autenticación de Laravel
 require __DIR__.'/auth.php';

@@ -7,3 +7,46 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Estilos para el portafolio */
+.portfolio-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.portfolio-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.portfolio-item img:hover {
+    transform: scale(1.05);
+}
+
+.portfolio-info {
+    text-align: center;
+}
+
+.portfolio-title {
+    font-size: 1.5rem; /* Tamaño del título */
+    font-weight: bold;
+    color: #ffffff; /* Color blanco para el título */
+    transition: color 0.3s ease;
+}
+
+.portfolio-title:hover {
+    color: #f39c12; /* Color al pasar el mouse */
+}
+
+.portfolio-description {
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo transparente */
+    padding: 10px;
+    border-radius: 5px;
+    color: rgba(255, 255, 255, 0.8); /* Blanco más apagado */
+    font-size: 0.9rem; /* Fuente más pequeña */
+    text-align: left;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
