@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 
 class EmployeeController extends Controller
 {
+    use AuthorizesRequests; // Usamos el trait para autorización
+
     /**
      * Display a listing of the resource.
      */
@@ -19,53 +22,59 @@ class EmployeeController extends Controller
         if (request()->ajax()) {
             return view('admin.employee.index', compact('employees'))->render();
         }
-    
-        return view('admin.dashboard', compact('employees')); // fallback si se accede sin AJAX
+
+        return view('admin.employee.index', compact('employees')); // Vista de empleados
     }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
-{
-    if (request()->ajax()) {
-        return view('admin.employee.create')->render();
+    {
+        $this->authorize('create', Employee::class);
+        return view('admin.employee.create'); // O tu vista principal por defecto
     }
-
-    return view('admin.dashboard'); // O tu vista principal por defecto
-}
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        // Validación
-        $validated = $request->validate([
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:categories,email',
-            'phone'     => 'required|string|max:20',
-            'position'  => 'required|string|max:255',
-            'salary'    => 'required|numeric|min:0',
-            'hire_date' => 'required|date',
-            'address'   => 'nullable|string',
-            'status'    => 'nullable|boolean',
+{
+    $this->authorize('create', Employee::class); // Verifica si el usuario puede crear empleados
+
+    // Validación
+    $validated = $request->validate([
+        'name'      => 'required|string|max:255',
+        'email'     => 'required|email|unique:employees,email',
+        'phone'     => 'required|string|max:20',
+        'position'  => 'required|string|max:255',
+        'salary'    => 'required|numeric|min:0',
+        'hire_date' => 'required|date',
+        'address'   => 'nullable|string',
+        'status'    => 'nullable|boolean',
+    ]);
+
+    // Crear el nuevo empleado
+    $employee = Employee::create($validated);
+
+    // Si la solicitud es AJAX, devolver un JSON con la redirección
+    if ($request->ajax()) {
+        return response()->json([
+            'redirect' => route('employee.index'),  // Redirigir al índice de empleados
         ]);
-
-        // Crear la categoría
-        Category::create($validated);
-
-        // Redirigir con éxito
-        return redirect()->route('categories.index')
-            ->with('success', 'Categoría creada exitosamente.');
     }
+
+    // Si no es AJAX, proceder con la redirección normal
+    return redirect()->route('employee.index')
+        ->with('success', 'Empleado creado exitosamente.'); 
+}
 
     /**
      * Display the specified resource.
      */
     public function show(Employee $employee)
     {
-        return view('employee.show', compact('employee'));
+        return view('admin.employee.show', compact('employee'));
     }
 
     /**
@@ -73,39 +82,61 @@ class EmployeeController extends Controller
      */
     public function edit(Employee $employee)
     {
-        return view('employee.edit', compact('employee'));
+        $this->authorize('update', $employee); // Verifica si el usuario puede editar este empleado
+
+        if (request()->ajax()) {
+            return view('admin.employee.edit', compact('employee'))->render();
+        }
+
+        return view('admin.dashboard'); // O tu vista principal por defecto
     }
 
     /**
      * Update the specified resource in storage.
-     */
-    public function update(Request $request, Employee $employee)
+     */public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:employees,email,' . $employee->id,
-            'phone'     => 'required|string|max:20',
-            'position'  => 'required|string|max:255',
-            'salary'    => 'required|numeric|min:0',
-            'hire_date' => 'required|date',
-            'address'   => 'nullable|string',
-            'status'    => 'boolean'
+    $employee = Employee::findOrFail($id);
+    $this->authorize('update', $employee);
+
+    $validated = $request->validate([
+        'name'      => 'required|string|max:255',
+        'email'     => 'required|email|unique:employees,email,' . $employee->id,
+        'phone'     => 'required|string|max:20',
+        'position'  => 'required|string|max:255',
+        'salary'    => 'required|numeric|min:0',
+        'hire_date' => 'required|date',
+        'address'   => 'nullable|string',
+        'status'    => 'required|boolean',
+    ]);
+
+    $employee->update($validated);
+
+    if ($request->ajax()) {
+        return response()->json([
+            'redirect' => route('employee.index'),
+            'message'  => 'Empleado actualizado exitosamente.'
         ]);
-
-        $employee->update($validated);
-
-        return redirect()->route('employee.index')
-            ->with('success', 'Empleado actualizado exitosamente.');
     }
+
+    return redirect()->route('employee.index')
+        ->with('success', 'Empleado actualizado exitosamente.');
+    }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Employee $employee)
+    public function destroy(Request $request, $id)
     {
+        $employee = Employee::findOrFail($id);
+        $this->authorize('delete', $employee);
         $employee->delete();
-
-        return redirect()->route('employee.index')
-            ->with('success', 'Empleado eliminado exitosamente.');
+    
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+    
+        return redirect()->route('employee.index')->with('success', 'Empleado eliminado exitosamente.');
     }
-}
+    
+ }

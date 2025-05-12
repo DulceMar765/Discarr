@@ -1,5 +1,3 @@
-{{-- resources/views/admin/employee/index.blade.php --}}
-
 <div class="admin-section">
     <h2 class="mb-4"><i class="bi bi-person-badge-fill me-2"></i> Gestión de Empleados</h2>
 
@@ -20,17 +18,13 @@
                 </thead>
                 <tbody>
                     @foreach($employees as $employee)
-                    <tr>
+                    <tr id="row-employee-{{ $employee->id }}">
                         <td>{{ $employee->id }}</td>
                         <td>{{ $employee->name }}</td>
                         <td>{{ $employee->email }}</td>
                         <td>
-                            <a href="{{ route('employee.edit', $employee->id) }}" class="btn btn-warning btn-sm">Editar</a>
-                            <form action="{{ route('employee.destroy', $employee->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
+                            <a href="#" onclick="loadAdminSection('{{ route('employee.edit', $employee->id) }}'); return false;" class="btn btn-warning btn-sm">Editar</a>
+                            <button onclick="deleteEmployee({{ $employee->id }});" class="btn btn-danger btn-sm">Eliminar</button>
                         </td>
                     </tr>
                     @endforeach
@@ -39,3 +33,31 @@
         </div>
     @endif
 </div>
+
+<script>
+// Función para eliminar un empleado
+function deleteEmployee(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este empleado?')) return;
+
+    fetch(`/employees/${id}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: new URLSearchParams({ _method: 'DELETE' })
+    })
+    .then(async response => {
+        if (response.ok) {
+            document.getElementById(`row-employee-${id}`).remove();
+        } else {
+            const data = await response.json();
+            alert(data.message || 'Error al eliminar el empleado.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Fallo al eliminar el empleado.');
+    });
+}
+</script>

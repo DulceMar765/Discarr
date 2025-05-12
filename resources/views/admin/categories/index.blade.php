@@ -1,5 +1,3 @@
-{{-- resources/views/admin/categories/index.blade.php --}}
-
 <div class="admin-section">
     <h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i> Gestión de Categorías</h2>
 
@@ -23,15 +21,17 @@
                 </thead>
                 <tbody>
                     @foreach($categories as $category)
-                    <tr>
+                    <tr id="category-row-{{ $category->id }}">
                         <td>{{ $category->id }}</td>
                         <td>{{ $category->name }}</td>
                         <td>
                             <a href="#" onclick="loadAdminSection('{{ route('categories.edit', $category->id) }}'); return false;" class="btn btn-warning btn-sm">Editar</a>
-                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST" class="d-inline">
+                            
+                            <!-- Formulario de eliminación con AJAX -->
+                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST" class="d-inline" id="delete-form-{{ $category->id }}">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                <button type="button" onclick="deleteCategory({{ $category->id }})" class="btn btn-danger btn-sm">Eliminar</button>
                             </form>
                         </td>
                     </tr>
@@ -41,3 +41,35 @@
         </div>
     @endif
 </div>
+
+<script>
+function deleteCategory(categoryId) {
+    if (confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
+        // Obtener el formulario de eliminación correspondiente
+        const form = document.getElementById('delete-form-' + categoryId);
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': form.querySelector('[name=_token]').value,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',  // Asegúrate de que la respuesta sea JSON
+            },
+            body: new FormData(form),
+        })
+        .then(async response => {
+            if (response.status === 200) {
+                const data = await response.json();
+                if (data.success) {
+                    // Eliminar la fila de la tabla
+                    document.getElementById('category-row-' + categoryId).remove();
+                }
+            } else {
+                console.error('Error al eliminar la categoría');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+</script>
+

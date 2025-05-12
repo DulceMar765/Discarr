@@ -77,9 +77,7 @@ Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.up
 Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 // Recursos principales
-Route::resource('employee', EmployeeController::class);
 Route::resource('supplier', SupplierController::class);
-Route::resource('categories', CategoryController::class);
 Route::resource('customer', CustomerController::class);
 Route::resource('material', MaterialController::class);
 Route::resource('projects', ProjectController::class);
@@ -157,6 +155,33 @@ Route::middleware('auth')->group(function () {
     Route::get('/portafolio/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('portfolio.edit');
     Route::put('/portafolio/{portfolio}', [PortfolioController::class, 'update'])->name('portfolio.update');
 });
+
+
+// Rutas protegidas categorias
+Route::middleware('auth')->group(function () {
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+});
+
+//Ruta empleado
+Route::middleware('auth')->group(function () {
+    // Rutas para mostrar la lista de empleados y crear uno nuevo
+    Route::get('/employees', [EmployeeController::class, 'index'])->name('employee.index');
+    Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employee.create');
+    Route::post('/employees', [EmployeeController::class, 'store'])->name('employee.store');
+    
+    // Rutas para editar y actualizar un empleado
+    Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employee.edit');
+    Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employee.update');
+    
+    // Ruta para eliminar un empleado
+    Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
+});
+
+
 
 // Rutas de autenticación de Laravel
 require __DIR__.'/auth.php';
