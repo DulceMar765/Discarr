@@ -83,7 +83,7 @@ document.getElementById('employee-edit-form').addEventListener('submit', functio
     fetch(form.action, {
         method: 'POST', // Laravel usa POST + _method para PUT
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
         },

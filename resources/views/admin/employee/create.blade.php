@@ -67,6 +67,9 @@
 </div>
 
 <script>
+console.log('Meta tag CSRF:', document.head.querySelector('meta[name="csrf-token"]'));
+console.log('Token CSRF:', document.head.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}');
+
 document.getElementById('employee-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -79,7 +82,7 @@ document.getElementById('employee-form').addEventListener('submit', function (e)
     fetch(form.action, {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
         },

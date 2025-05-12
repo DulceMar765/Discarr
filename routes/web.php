@@ -76,11 +76,46 @@ Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit')
 Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+// Ruta temporal para compatibilidad
+Route::get('/suppliers', [SupplierController::class, 'index'])->name('Suppliers.index');
+
 // Recursos principales
-Route::resource('supplier', SupplierController::class);
-Route::resource('customer', CustomerController::class);
-Route::resource('material', MaterialController::class);
-Route::resource('projects', ProjectController::class);
+Route::resource('supplier', SupplierController::class)->names([
+    'index' => 'supplier.index',
+    'create' => 'supplier.create',
+    'store' => 'supplier.store',
+    'show' => 'supplier.show',
+    'edit' => 'supplier.edit',
+    'update' => 'supplier.update',
+    'destroy' => 'supplier.destroy'
+]);
+Route::resource('customer', CustomerController::class)->names([
+    'index' => 'customer.index',
+    'create' => 'customer.create',
+    'store' => 'customer.store',
+    'show' => 'customer.show',
+    'edit' => 'customer.edit',
+    'update' => 'customer.update',
+    'destroy' => 'customer.destroy'
+]);
+Route::resource('material', MaterialController::class)->names([
+    'index' => 'material.index',
+    'create' => 'material.create',
+    'store' => 'material.store',
+    'show' => 'material.show',
+    'edit' => 'material.edit',
+    'update' => 'material.update',
+    'destroy' => 'material.destroy'
+]);
+Route::resource('projects', ProjectController::class)->names([
+    'index' => 'projects.index',
+    'create' => 'projects.create',
+    'store' => 'projects.store',
+    'show' => 'projects.show',
+    'edit' => 'projects.edit',
+    'update' => 'projects.update',
+    'destroy' => 'projects.destroy'
+]);
 
 // Rutas para reservaciones (appointments)
 Route::get('/appointments/create', [AppointmentsController::class, 'create'])->name('appointments.create');
@@ -93,7 +128,15 @@ Route::get('/categories', [CategoryController::class, 'index'])->name('categorie
 Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
 
 // Rutas para la sección de reservaciones
-Route::resource('appointments', AppointmentsController::class);
+Route::resource('appointments', AppointmentsController::class)->names([
+    'index' => 'appointments.index',
+    'create' => 'appointments.create',
+    'store' => 'appointments.store',
+    'show' => 'appointments.show',
+    'edit' => 'appointments.edit',
+    'update' => 'appointments.update',
+    'destroy' => 'appointments.destroy'
+]);
 
 // Rutas para la sección de reservaciones en el panel de administración
 Route::prefix('admin/appointments')->name('admin.appointments.')->group(function () {

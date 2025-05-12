@@ -56,7 +56,7 @@ class SupplierController extends Controller
             // Crea el proveedor
             Supplier::create($request->all());
     
-            return redirect()->route('Suppliers.index')->with('success', 'Proveedor agregado exitosamente.');
+            return redirect()->route('supplier.index')->with('success', 'Proveedor agregado exitosamente.');
         }
     
         /**
@@ -97,7 +97,7 @@ class SupplierController extends Controller
             // Actualiza el proveedor
             $Supplier->update($request->all());
     
-            return redirect()->route('Suppliers.index')->with('success', 'Proveedor actualizado exitosamente.');
+            return redirect()->route('supplier.index')->with('success', 'Proveedor actualizado exitosamente.');
         }
     
         /**
@@ -108,6 +108,6 @@ class SupplierController extends Controller
             // Elimina el proveedor
             $Supplier->delete();
     
-            return redirect()->route('Suppliers.index')->with('success', 'Proveedor eliminado exitosamente.');
+            return redirect()->route('supplier.index')->with('success', 'Proveedor eliminado exitosamente.');
         }
     }

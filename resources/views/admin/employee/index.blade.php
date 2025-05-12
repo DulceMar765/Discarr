@@ -42,7 +42,7 @@ function deleteEmployee(id) {
     fetch(`/employees/${id}`, {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
             'X-Requested-With': 'XMLHttpRequest',
         },
         body: new URLSearchParams({ _method: 'DELETE' })
