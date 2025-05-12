@@ -29,6 +29,16 @@ class AppointmentsController extends Controller
     // Crear una nueva cita
     public function create(Request $request)
     {
+        // Verificar que el usuario esté autenticado
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para realizar una reservación.');
+        }
+        
+        // Verificar que el usuario tenga el rol de cliente
+        if (Auth::user()->role !== 'cliente') {
+            return redirect()->route('home')->with('error', 'Solo los clientes pueden realizar reservaciones.');
+        }
+        
         // Elimina los días pasados
         $this->deletePastDays();
 
@@ -83,12 +93,19 @@ class AppointmentsController extends Controller
     // Almacenar una nueva cita
     public function store(Request $request)
     {
+        // Verificar que el usuario esté autenticado
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para realizar una reservación.');
+        }
+        
+        // Verificar que el usuario tenga el rol de cliente
+        if (Auth::user()->role !== 'cliente') {
+            return redirect()->back()->withErrors(['auth' => 'Solo los clientes pueden realizar reservaciones.']);
+        }
+        
         $request->validate([
             'calendar_day' => 'required|date|after_or_equal:today', // La fecha debe ser hoy o futura
             'time_slot' => 'required|date_format:H:i|after_or_equal:09:00|before_or_equal:16:00', // La hora debe estar entre 09:00 y 16:00
-            'requester_name' => 'required|string|max:255',
-            'requester_email' => 'required|email|max:255',
-            'requester_phone' => 'required|string|max:20',
             'description' => 'nullable|string|max:1000', // Validar la descripción (opcional)
         ]);
 
@@ -108,16 +125,19 @@ class AppointmentsController extends Controller
             return redirect()->back()->withErrors(['time_slot' => 'El horario seleccionado ya está reservado.']);
         }
 
+        // Obtener los datos del usuario autenticado
+        $user = Auth::user();
+
         // Crear la cita
         Appointment::create([
-            'user_id' => Auth::id(), // ID del usuario autenticado
+            'user_id' => $user->id,
             'calendar_day_id' => $calendarDay->id,
             'time_slot' => $request->time_slot,
             'description' => $request->description, // Guardar la descripción
             'status' => 'pending', // Estado inicial de la cita
-            'requester_name' => $request->requester_name,
-            'requester_email' => $request->requester_email,
-            'requester_phone' => $request->requester_phone,
+            'requester_name' => $user->name,
+            'requester_email' => $user->email,
+            'requester_phone' => $user->phone ?? 'No especificado',
         ]);
 
         // Actualizar todos los días del calendario
@@ -126,87 +146,8 @@ class AppointmentsController extends Controller
         return redirect()->route('appointments.index')->with('success', 'Cita creada exitosamente.');
     }
 
-    // Eliminar una cita
-    public function destroy($id)
-    {
-        $appointment = Appointment::findOrFail($id);
-        $appointment->delete();
 
-        // Actualizar todos los días del calendario
-        $this->updateAllCalendarDays();
 
-        return redirect()->route('appointments.index')->with('success', 'Cita eliminada exitosamente.');
-    }
-
-    public function edit($id)
-    {
-        // Encuentra la cita por su ID
-        $appointment = Appointment::findOrFail($id);
-
-        // Obtén todos los días del calendario
-        $calendarDays = CalendarDay::all()->map(function ($day) {
-            $day->available_slots = Appointment::where('calendar_day_id', $day->id)
-                ->where('time_slot', '>=', now()->format('H:i')) // Solo horarios futuros
-                ->pluck('time_slot')
-                ->toArray();
-            return $day;
-        });
-
-        // Preselecciona la fecha y hora de la cita
-        $preselectedDate = $appointment->calendarDay->date;
-        $preselectedTime = $appointment->time_slot;
-
-        // Retorna la vista de edición con los datos necesarios
-        return view('appointments.edit', compact('appointment', 'calendarDays', 'preselectedDate', 'preselectedTime'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        // Validar los datos enviados desde el formulario
-        $request->validate([
-            'calendar_day' => 'required|date', // Asegura que se envíe una fecha válida
-            'time_slot' => 'required|date_format:H:i', // Valida el formato de la hora
-            'requester_name' => 'required|string|max:255', // Valida el nombre del solicitante
-            'requester_email' => 'required|email|max:255', // Valida el correo electrónico
-            'requester_phone' => 'required|string|max:15', // Valida el teléfono
-            'description' => 'nullable|string|max:1000', // La descripción es opcional
-        ]);
-
-        // Encuentra la cita por su ID
-        $appointment = Appointment::findOrFail($id);
-
-        // Encuentra el día del calendario correspondiente
-        $calendarDay = CalendarDay::where('date', $request->calendar_day)->first();
-
-        if (!$calendarDay) {
-            return redirect()->back()->withErrors(['calendar_day' => 'El día seleccionado no es válido.']);
-        }
-
-        // Verifica si el horario ya está ocupado por otra cita
-        $existingAppointment = Appointment::where('calendar_day_id', $calendarDay->id)
-            ->where('time_slot', $request->time_slot)
-            ->where('id', '!=', $id) // Excluye la cita actual
-            ->first();
-
-        if ($existingAppointment) {
-            return redirect()->back()->withErrors(['time_slot' => 'El horario seleccionado ya está reservado.']);
-        }
-
-        // Actualiza los datos de la cita
-        $appointment->update([
-            'calendar_day_id' => $calendarDay->id,
-            'time_slot' => $request->time_slot,
-            'requester_name' => $request->requester_name,
-            'requester_email' => $request->requester_email,
-            'requester_phone' => $request->requester_phone,
-            'description' => $request->description,
-        ]);
-
-        // Actualiza los slots reservados y el estado del día del calendario
-        $this->updateBookedSlots($calendarDay->id);
-
-        return redirect()->route('appointments.index')->with('success', 'Cita actualizada correctamente.');
-    }
 
     // Método para actualizar booked_slots
     private function updateBookedSlots($calendarDayId)
@@ -575,5 +516,38 @@ class AppointmentsController extends Controller
         return [
             '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'
         ];
+    }
+    
+    /**
+     * Actualizar el estado de una reservación
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        // Verificar que el usuario esté autenticado y sea administrador
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            return response()->json(['success' => false, 'message' => 'No tienes permisos para realizar esta acción'], 403);
+        }
+        
+        // Validar los datos de entrada
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,cancelled',
+        ]);
+        
+        // Buscar la cita
+        $appointment = Appointment::findOrFail($id);
+        
+        // Actualizar el estado
+        $appointment->status = $request->status;
+        $appointment->save();
+        
+        return response()->json([
+            'success' => true, 
+            'message' => 'Estado de la reservación actualizado correctamente',
+            'appointment' => $appointment
+        ]);
     }
 }

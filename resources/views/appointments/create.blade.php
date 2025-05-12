@@ -41,17 +41,17 @@
             </div>
             <div class="col-md-5">
                 <h5 class="mb-3 text-warning">Datos del solicitante</h5>
-                <div class="mb-2">
-                    <label class="form-label">Nombre completo</label>
-                    <input type="text" name="requester_name" class="form-control" required>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Correo electrónico</label>
-                    <input type="email" name="requester_email" class="form-control" required>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Teléfono</label>
-                    <input type="tel" name="requester_phone" class="form-control" required>
+                <div class="alert alert-info">
+                    <p><i class="bi bi-info-circle"></i> Se utilizarán los datos de tu perfil para esta reservación.</p>
+                    @auth
+                    <ul class="mb-0">
+                        <li><strong>Nombre:</strong> {{ Auth::user()->name }}</li>
+                        <li><strong>Correo:</strong> {{ Auth::user()->email }}</li>
+                        <li><strong>Teléfono:</strong> {{ Auth::user()->phone ?? 'No especificado' }}</li>
+                    </ul>
+                    @else
+                    <p>Por favor <a href="{{ route('login') }}">inicia sesión</a> para realizar una reservación.</p>
+                    @endauth
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Motivo o descripción</label>
