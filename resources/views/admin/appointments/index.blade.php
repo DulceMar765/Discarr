@@ -1,11 +1,31 @@
 {{-- resources/views/admin/appointments/index.blade.php --}}
 
-<!-- FullCalendar CSS -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<!-- Esta vista se carga via AJAX en el panel de administración -->
 
-<!-- FullCalendar JS -->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+<style>
+    .calendar-day {
+        padding: 5px;
+        text-align: center;
+        border-radius: 4px;
+        margin: 2px;
+        cursor: pointer;
+    }
+    .calendar-day:hover {
+        opacity: 0.8;
+    }
+    .calendar-day.green {
+        background-color: #28a745;
+        color: white;
+    }
+    .calendar-day.yellow {
+        background-color: #ffc107;
+        color: black;
+    }
+    .calendar-day.red {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
 
 <div class="admin-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -17,7 +37,7 @@
         </div>
     </div>
     
-    <!-- Calendario de Reservaciones -->
+    <!-- Calendario de Reservaciones - Versión Simplificada -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow">
@@ -25,14 +45,57 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 text-primary"><i class="bi bi-calendar3 me-2"></i>Vista de Calendario</h5>
                         <div>
-                            <button id="toggleCalendarView" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-arrows-angle-expand"></i> Expandir/Contraer
-                            </button>
+                            <span class="badge bg-success">Verde: Disponible</span>
+                            <span class="badge bg-warning text-dark">Amarillo: Poca disponibilidad</span>
+                            <span class="badge bg-danger">Rojo: Ocupado</span>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div id="appointments-calendar" class="fc-theme-standard"></div>
+                    <div class="row">
+                        <div class="col-md-7">
+                            <!-- Calendario simple -->
+                            <h6 class="mb-3">Fechas con Reservaciones ({{ count($appointments) }} en total):</h6>
+                            <div id="simple-calendar" class="d-flex flex-wrap mb-3">
+                                @php
+                                    // Agrupar citas por fecha
+                                    $appointmentsByDate = [];
+                                    foreach ($appointments as $appointment) {
+                                        $date = $appointment->calendar_day->date;
+                                        if (!isset($appointmentsByDate[$date])) {
+                                            $appointmentsByDate[$date] = [];
+                                        }
+                                        $appointmentsByDate[$date][] = $appointment;
+                                    }
+                                    // Ordenar por fecha
+                                    ksort($appointmentsByDate);
+                                @endphp
+
+                                @forelse ($appointmentsByDate as $date => $appts)
+                                    @php
+                                        // Determinar color por cantidad de citas
+                                        $colorClass = count($appts) < 3 ? 'green' : (count($appts) < 5 ? 'yellow' : 'red');
+                                    @endphp
+                                    <div class="calendar-day {{ $colorClass }}" onclick="showAppointmentsForDate('{{ $date }}')">
+                                        {{ date('d M', strtotime($date)) }}
+                                        <span class="badge bg-secondary">{{ count($appts) }}</span>
+                                    </div>
+                                @empty
+                                    <div class="alert alert-info w-100">No hay reservaciones registradas.</div>
+                                @endforelse
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0" id="appointments-date-title">Detalles de Reservaciones</h6>
+                                </div>
+                                <div class="card-body" id="appointments-detail">
+                                    <p class="text-center text-muted">Haz clic en una fecha para ver las reservaciones de ese día.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -218,112 +281,99 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        });
+    // Asegurarse que este script se ejecute después de la carga incluso si es vía AJAX
+    (function() {
+        console.log('Script de appointments iniciado');
         
-        // Inicializar el calendario de reservaciones
-        const calendarEl = document.getElementById('appointments-calendar');
-        if (calendarEl) {
+        // Configuración para mostrar detalles de las citas
+        window.showAppointmentsForDate = function(date) {
+            console.log('Mostrando citas para fecha:', date);
+            
+            // Obtener las citas de la fecha seleccionada
             const appointmentsData = @json($appointments);
+            const appointments = appointmentsData.filter(appointment => 
+                appointment.calendar_day.date === date
+            );
             
-            // Convertir las reservaciones al formato de eventos de FullCalendar
-            const events = appointmentsData.map(appointment => {
-                // Determinar el color según el estado
-                let color;
-                switch(appointment.status) {
-                    case 'confirmed':
-                        color = '#28a745'; // verde
-                        break;
-                    case 'pending':
-                        color = '#ffc107'; // amarillo
-                        break;
-                    case 'cancelled':
-                        color = '#dc3545'; // rojo
-                        break;
-                    default:
-                        color = '#6c757d'; // gris
-                }
-                
-                return {
-                    id: appointment.id,
-                    title: `${appointment.requester_name} - ${appointment.time_slot}`,
-                    start: `${appointment.calendar_day.date}T${appointment.time_slot}`,
-                    color: color,
-                    extendedProps: {
-                        requester_name: appointment.requester_name,
-                        requester_email: appointment.requester_email,
-                        requester_phone: appointment.requester_phone,
-                        description: appointment.description,
-                        status: appointment.status
-                    }
-                };
+            // Actualizar el título
+            const dateFormatted = new Date(date).toLocaleDateString('es-ES', {
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
             });
+            document.getElementById('appointments-date-title').textContent = `Citas: ${dateFormatted}`;
             
-            // Inicializar el calendario
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,listWeek'
-                },
-                locale: 'es',
-                events: events,
-                eventClick: function(info) {
-                    // Mostrar detalles de la reservación al hacer clic
-                    const event = info.event;
-                    const props = event.extendedProps;
-                    const statusBadge = `<span class="badge ${props.status == 'confirmed' ? 'bg-success' : (props.status == 'pending' ? 'bg-warning' : 'bg-danger')}">${props.status}</span>`;
+            // Preparar contenido HTML
+            let html = '';
+            
+            if (appointments.length === 0) {
+                html = '<div class="alert alert-info">No hay citas para esta fecha.</div>';
+            } else {
+                html = '<div class="list-group">';
+                appointments.forEach(appointment => {
+                    // Determinar la clase del badge según el estado
+                    let statusClass, statusLabel;
+                    switch(appointment.status) {
+                        case 'confirmed':
+                            statusClass = 'success';
+                            statusLabel = 'Confirmada';
+                            break;
+                        case 'pending':
+                            statusClass = 'warning';
+                            statusLabel = 'Pendiente';
+                            break;
+                        case 'cancelled':
+                            statusClass = 'danger';
+                            statusLabel = 'Cancelada';
+                            break;
+                        default:
+                            statusClass = 'secondary';
+                            statusLabel = appointment.status;
+                    }
                     
-                    // Usar SweetAlert2 si está disponible, de lo contrario usar alert
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            title: `Reservación #${event.id}`,
-                            html: `
-                                <div class="text-start">
-                                    <p><strong>Cliente:</strong> ${props.requester_name}</p>
-                                    <p><strong>Contacto:</strong> ${props.requester_email} | ${props.requester_phone}</p>
-                                    <p><strong>Fecha:</strong> ${event.start.toLocaleDateString()}</p>
-                                    <p><strong>Hora:</strong> ${event.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-                                    <p><strong>Estado:</strong> ${statusBadge}</p>
-                                    <p><strong>Descripción:</strong> ${props.description || 'No hay descripción'}</p>
-                                </div>
-                            `,
-                            confirmButtonText: 'Cerrar',
-                            showDenyButton: true,
-                            denyButtonText: 'Editar',
-                        }).then((result) => {
-                            if (result.isDenied) {
-                                loadAdminSection(`/admin/appointments/${event.id}/edit`);
-                            }
-                        });
-                    } else {
-                        alert(`Reservación #${event.id} - ${props.requester_name} - ${event.start.toLocaleDateString()}`);
-                    }
-                },
-                height: 500 // Altura inicial del calendario
-            });
+                    html += `
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">${appointment.requester_name}</h6>
+                                <span class="badge bg-${statusClass}">${statusLabel}</span>
+                            </div>
+                            <div class="small">
+                                <p class="mb-1"><strong>Hora:</strong> ${appointment.time_slot}</p>
+                                <p class="mb-1"><strong>Contacto:</strong> ${appointment.requester_email} | ${appointment.requester_phone}</p>
+                                <p class="mb-1"><strong>Descripción:</strong> ${appointment.description || 'Sin descripción'}</p>
+                            </div>
+                            <div class="mt-2 d-flex justify-content-end">
+                                <button onclick="loadAdminSection('/admin/appointments/${appointment.id}/edit')" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                <button onclick="deleteAppointment(${appointment.id})" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
             
-            calendar.render();
-            
-            // Manejar el botón de expandir/contraer
-            document.getElementById('toggleCalendarView').addEventListener('click', function() {
-                const currentHeight = calendar.getOption('height');
-                if (currentHeight === 500) {
-                    calendar.setOption('height', 800);
-                    this.innerHTML = '<i class="bi bi-arrows-angle-contract"></i> Contraer';
-                } else {
-                    calendar.setOption('height', 500);
-                    this.innerHTML = '<i class="bi bi-arrows-angle-expand"></i> Expandir';
-                }
-            });
-        }
+            // Actualizar el contenido
+            document.getElementById('appointments-detail').innerHTML = html;
+        };
         
-        // Filtrado por estado
+        // Si hay fechas en el calendario, mostrar la primera por defecto
+        const calendarDays = document.querySelectorAll('.calendar-day');
+        if (calendarDays.length > 0) {
+            // Obtener la fecha del primer día del calendario y mostrar sus citas
+            const firstDate = calendarDays[0].getAttribute('onclick').match(/'([^']+)'/)[1];
+            showAppointmentsForDate(firstDate);
+        }
+    })();
+</script>
+
+<script>
+    // Filtrado por estado
+    document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.filter-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const filter = this.getAttribute('data-filter');
@@ -424,36 +474,44 @@
     }
     
     function exportToCSV() {
-        // Implementación básica de exportación a CSV
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "ID,Cliente,Email,Teléfono,Fecha,Hora,Descripción,Estado\n";
-        
-        const rows = document.querySelectorAll('#appointmentsTable tbody tr:not([style*="display: none"])');
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells.length > 1) { // Ignorar filas vacías
-                const id = cells[0].textContent.trim();
-                const name = cells[1].textContent.trim();
-                const contactInfo = cells[2].textContent.trim().split('\n');
-                const email = contactInfo[0].replace('✉️ ', '');
-                const phone = contactInfo[1].replace('📞 ', '');
-                const date = cells[3].textContent.trim();
-                const time = cells[4].textContent.trim();
-                const description = cells[5].textContent.trim().replace(/"/g, '""'); // Escapar comillas
-                const status = cells[6].textContent.trim();
-                
-                csvContent += `"${id}","${name}","${email}","${phone}","${date}","${time}","${description}","${status}"\n`;
-            }
+        // Exportar a CSV
+        document.getElementById('exportCSV').addEventListener('click', function() {
+            // Crear encabezados del CSV
+            let csvContent = "ID,Cliente,Email,Teléfono,Fecha,Hora,Descripción,Estado\n";
+            
+            const rows = document.querySelectorAll('#appointmentsTable tbody tr:not([style*="display: none"])');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 1) {
+                    const id = cells[0].textContent.trim();
+                    const name = cells[1].textContent.trim();
+                    const contact = cells[2].textContent.trim();
+                    const email = contact.includes('@') ? contact.split('|')[0].trim() : '';
+                    const phone = contact.includes('|') ? contact.split('|')[1].trim() : contact;
+                    const date = cells[3].textContent.trim();
+                    const time = cells[4].textContent.trim();
+                    const description = cells[5].textContent.trim().replace(/"/g, '""'); // Escapar comillas
+                    const status = cells[6].textContent.trim();
+                    
+                    csvContent += `"${id}","${name}","${email}","${phone}","${date}","${time}","${description}","${status}"\n`;
+                }
+            });
+            
+            // Crear y descargar el archivo
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'reservaciones_' + new Date().toISOString().split('T')[0] + ".csv");
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
-        
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "reservaciones_" + new Date().toISOString().split('T')[0] + ".csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
     }
+});
 </script>
 
 <style>
