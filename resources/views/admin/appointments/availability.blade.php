@@ -1,5 +1,8 @@
 {{-- resources/views/admin/appointments/availability.blade.php --}}
 
+<!-- Meta CSRF para solicitudes AJAX -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <!-- FullCalendar CSS -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 
@@ -34,7 +37,7 @@
                     <h5 class="mb-0 text-primary"><i class="bi bi-calendar3 me-2"></i>Calendario de Disponibilidad</h5>
                 </div>
                 <div class="card-body">
-                    <div id="availability-calendar" class="fc-theme-standard"></div>
+                    <div id="availability-calendar" class="fc-theme-standard" style="height: 500px; width: 100%;"></div>
                 </div>
             </div>
             
@@ -199,33 +202,51 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar el calendario
-        const calendarEl = document.getElementById('availability-calendar');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek'
-            },
-            locale: 'es',
-            selectable: true,
-            select: function(info) {
-                selectDate(info.startStr);
-            },
-            eventClick: function(info) {
-                selectDate(info.event.startStr.split('T')[0]);
-            },
-            events: '/admin/appointments/calendar-data',
-            eventContent: function(arg) {
-                return { html: `<div class=\"fc-event-title\">${arg.event.title}</div>` };
-            },
-            datesSet: function() {
-                updateStatistics();
+    // Función para inicializar el calendario (puede ser llamada directamente o después de cargar la página)
+    function initCalendar() {
+        try {
+            var calendarEl = document.getElementById('availability-calendar');
+            
+            if (!calendarEl) {
+                console.error('No se encontró el elemento del calendario');
+                return;
             }
-        });
-        calendar.render();
+            
+            if (typeof FullCalendar === 'undefined') {
+                console.error('FullCalendar no está definido');
+                return;
+            }
+            
+            // Crear un calendario básico
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek'
+                },
+                locale: 'es',
+                selectable: true,
+                select: function(info) {
+                    selectDate(info.startStr);
+                },
+                eventClick: function(info) {
+                    selectDate(info.event.startStr.split('T')[0]);
+                },
+                events: '/admin/appointments/calendar-data',
+                eventContent: function(arg) {
+                    return { html: '<div class="fc-event-title">' + arg.event.title + '</div>' };
+                },
+                datesSet: function() {
+                    updateStatistics();
+                }
+            });
+            
+            // Renderizar el calendario
+            calendar.render();
+        } catch (e) {
+            console.error('Error al inicializar el calendario:', e);
+        }
 
         // Variables y elementos del DOM
         const selectedDateInput = document.getElementById('selected_date');
@@ -347,12 +368,15 @@
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Guardando...';
 
+            // Configurar el token CSRF para todas las solicitudes AJAX
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            
             // Enviar datos al servidor
             fetch('/admin/appointments/save-availability', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-CSRF-TOKEN': csrfToken ? csrfToken.getAttribute('content') : '',
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify(formData)
@@ -428,5 +452,23 @@
         
         // Inicializar estadísticas
         updateStatistics();
-    });
+    }
+    
+    // Asegurarse de que FullCalendar esté cargado antes de inicializar el calendario
+    function waitForFullCalendar() {
+        if (typeof FullCalendar !== 'undefined') {
+            initCalendar();
+        } else {
+            // Esperar 100ms y volver a intentar
+            setTimeout(waitForFullCalendar, 100);
+        }
+    }
+    
+    // Iniciar la verificación
+    waitForFullCalendar();
+    
+    // También inicializar cuando el documento esté listo (para cargas directas)
+    document.addEventListener('DOMContentLoaded', initCalendar);
+    
+    // Para cuando se carga mediante AJAX (esto lo detectará el script principal)
 </script>

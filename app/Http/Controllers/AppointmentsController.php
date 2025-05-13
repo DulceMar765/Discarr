@@ -152,9 +152,20 @@ class AppointmentsController extends Controller
     // Método para actualizar booked_slots
     private function updateBookedSlots($calendarDayId)
     {
-        $calendarDay = CalendarDay::findOrFail($calendarDayId); // Corregido: Se usa calendar_days en lugar de CalendarDay
-        $calendarDay->booked_slots = Appointment::where('calendar_day_id', $calendarDayId)->count();
-        $calendarDay->availability_status = $this->calculateAvailabilityStatus($calendarDay);
+        // Si el ID es nulo, no hacer nada
+        if (!$calendarDayId) return;
+        
+        // Buscar el día del calendario
+        $calendarDay = CalendarDay::find($calendarDayId);
+        if (!$calendarDay) return;
+        
+        // Contar las citas confirmadas para este día
+        $bookedCount = Appointment::where('calendar_day_id', $calendarDayId)
+            ->where('status', 'confirmed')
+            ->count();
+        
+        // Actualizar el contador
+        $calendarDay->booked_slots = $bookedCount;
         $calendarDay->save();
     }
 
@@ -461,6 +472,12 @@ class AppointmentsController extends Controller
             ]
         );
         
+        // Limpiar cualquier cita existente del sistema para este día
+        // Esto evita que las citas antiguas aparezcan como reservadas
+        Appointment::where('calendar_day_id', $calendarDay->id)
+            ->where('requester_name', 'Disponible')
+            ->delete();
+            
         // Actualizar el estado del día
         switch ($request->status) {
             case 'available':
@@ -470,9 +487,11 @@ class AppointmentsController extends Controller
                 break;
             case 'unavailable':
                 $calendarDay->availability_status = 'red';
+                $calendarDay->available_slots = null; // Limpiar slots cuando no está disponible
                 break;
             case 'holiday':
                 $calendarDay->availability_status = 'purple';
+                $calendarDay->available_slots = null; // Limpiar slots cuando es día festivo
                 break;
         }
         
