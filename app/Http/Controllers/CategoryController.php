@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category; 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    use AuthorizesRequests;
+
+    // Mostrar todas las categorías
     public function index()
     {
         $categories = Category::all();
@@ -20,58 +19,91 @@ class CategoryController extends Controller
             return view('admin.categories.index', compact('categories'))->render();
         }
 
-        return view('admin.categories.index', compact('categories')); // Corregido para mostrar la vista correcta
+        return view('admin.categories.index', compact('categories'));
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Mostrar el formulario de creación (solo admins)
     public function create()
     {
+        $this->authorize('create', Category::class);
         return view('admin.categories.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreCategoryRequest $request)
+    // Guardar una nueva categoría
+    public function store(Request $request)
     {
-        Category::create($request->validated());
-        return redirect()->route('categories.index')->with('success', 'Categoría creada correctamente.');
+        // Validación de los datos del formulario
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+        
+        // Crear la nueva categoría
+        $category = Category::create($validated);
+    
+        // Si la solicitud es AJAX, devolver un JSON con la redirección
+        if ($request->ajax()) {
+            return response()->json([
+                'redirect' => route('categories.index')  // Redirigir al índice de categorías
+            ]);
+        }
+    
+        // Si no es AJAX, proceder con la redirección normal
+        return redirect()->route('categories.index')->with('success', 'Categoría creada exitosamente');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Categorie $categorie)
+    // Mostrar una categoría específica (si lo necesitas)
+    public function show(Category $category)
     {
-        return view('categories.show', compact('categorie'));
+        return view('admin.categories.show', compact('category'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Categorie $categorie)
+    // Mostrar el formulario de edición
+    public function edit(Category $category)
     {
-        return view('categories.edit', compact('categorie'));
+        $this->authorize('update', $category);
+        return view('admin.categories.edit', compact('category'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateCategoryRequest $request, Categorie $categorie)
+    // Actualizar una categoría
+    public function update(Request $request, $id)
     {
-        $categorie->update($request->validated());
-        return redirect()->route('categories.index')->with('success', 'Categoría actualizada.');
+        // Validación de los datos
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        // Obtener la categoría a actualizar
+        $category = Category::findOrFail($id);
+        $category->update($validated);
+
+        // Si la solicitud es AJAX, devolver la URL de redirección
+        if ($request->ajax()) {
+            return response()->json([
+                'redirect' => route('categories.index'),  // URL para redirigir al índice de categorías
+            ]);
+        }
+
+        // Si no es AJAX, proceder con la redirección normal
+        return redirect()->route('categories.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Categorie $categorie)
+    // Eliminar una categoría
+    public function destroy(Request $request, Category $category)
     {
-        $categorie->delete();
-        return redirect()->route('categories.index')->with('success', 'Categoría eliminada.');
+        $this->authorize('delete', $category);
+        $category->delete();
+
+        // Si la solicitud es AJAX, devolver un JSON con la información de éxito
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,  // Confirmar la eliminación exitosa
+            ]);
+        }
+
+        // Si no es AJAX, proceder con la redirección normal
+        return redirect()->route('categories.index')->with('success', 'Categoría eliminada correctamente.');
     }
+
 }

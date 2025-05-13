@@ -76,13 +76,46 @@ Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit')
 Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+// Ruta temporal para compatibilidad
+Route::get('/suppliers', [SupplierController::class, 'index'])->name('Suppliers.index');
+
 // Recursos principales
-Route::resource('employee', EmployeeController::class);
-Route::resource('supplier', SupplierController::class);
-Route::resource('categories', CategoryController::class);
-Route::resource('customer', CustomerController::class);
-Route::resource('material', MaterialController::class);
-Route::resource('projects', ProjectController::class);
+Route::resource('supplier', SupplierController::class)->names([
+    'index' => 'supplier.index',
+    'create' => 'supplier.create',
+    'store' => 'supplier.store',
+    'show' => 'supplier.show',
+    'edit' => 'supplier.edit',
+    'update' => 'supplier.update',
+    'destroy' => 'supplier.destroy'
+]);
+Route::resource('customer', CustomerController::class)->names([
+    'index' => 'customer.index',
+    'create' => 'customer.create',
+    'store' => 'customer.store',
+    'show' => 'customer.show',
+    'edit' => 'customer.edit',
+    'update' => 'customer.update',
+    'destroy' => 'customer.destroy'
+]);
+Route::resource('material', MaterialController::class)->names([
+    'index' => 'material.index',
+    'create' => 'material.create',
+    'store' => 'material.store',
+    'show' => 'material.show',
+    'edit' => 'material.edit',
+    'update' => 'material.update',
+    'destroy' => 'material.destroy'
+]);
+Route::resource('projects', ProjectController::class)->names([
+    'index' => 'projects.index',
+    'create' => 'projects.create',
+    'store' => 'projects.store',
+    'show' => 'projects.show',
+    'edit' => 'projects.edit',
+    'update' => 'projects.update',
+    'destroy' => 'projects.destroy'
+]);
 
 // Rutas para reservaciones (appointments)
 Route::get('/appointments/create', [AppointmentsController::class, 'create'])->name('appointments.create');
@@ -95,7 +128,15 @@ Route::get('/categories', [CategoryController::class, 'index'])->name('categorie
 Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
 
 // Rutas para la sección de reservaciones
-Route::resource('appointments', AppointmentsController::class);
+Route::resource('appointments', AppointmentsController::class)->names([
+    'index' => 'appointments.index',
+    'create' => 'appointments.create',
+    'store' => 'appointments.store',
+    'show' => 'appointments.show',
+    'edit' => 'appointments.edit',
+    'update' => 'appointments.update',
+    'destroy' => 'appointments.destroy'
+]);
 
 // Rutas para la sección de reservaciones en el panel de administración
 Route::prefix('admin/appointments')->name('admin.appointments.')->group(function () {
@@ -110,6 +151,7 @@ Route::prefix('admin/appointments')->name('admin.appointments.')->group(function
     Route::get('/day-config/{date}', [AppointmentsController::class, 'getDayConfig'])->name('day-config');
     Route::post('/save-availability', [AppointmentsController::class, 'saveAvailability'])->name('save-availability');
     Route::get('/available-slots', [AppointmentsController::class, 'getAvailableSlots'])->name('available-slots');
+    Route::patch('/{appointment}/status', [AppointmentsController::class, 'updateStatus'])->name('update-status');
 });
 
 // Rutas completas para la sección de clientes
@@ -157,6 +199,33 @@ Route::middleware('auth')->group(function () {
     Route::get('/portafolio/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('portfolio.edit');
     Route::put('/portafolio/{portfolio}', [PortfolioController::class, 'update'])->name('portfolio.update');
 });
+
+
+// Rutas protegidas categorias
+Route::middleware('auth')->group(function () {
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+});
+
+//Ruta empleado
+Route::middleware('auth')->group(function () {
+    // Rutas para mostrar la lista de empleados y crear uno nuevo
+    Route::get('/employees', [EmployeeController::class, 'index'])->name('employee.index');
+    Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employee.create');
+    Route::post('/employees', [EmployeeController::class, 'store'])->name('employee.store');
+    
+    // Rutas para editar y actualizar un empleado
+    Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employee.edit');
+    Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employee.update');
+    
+    // Ruta para eliminar un empleado
+    Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
+});
+
+
 
 // Rutas de autenticación de Laravel
 require __DIR__.'/auth.php';

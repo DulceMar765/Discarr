@@ -9,11 +9,9 @@ use Illuminate\Auth\Access\Response;
 class EmployeePolicy
 {
     /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+       public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -21,7 +19,7 @@ class EmployeePolicy
      */
     public function view(User $user, Employee $employee): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -29,7 +27,7 @@ class EmployeePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isAdmin();  // Devolver un valor booleano (true o false)
     }
 
     /**
@@ -37,7 +35,7 @@ class EmployeePolicy
      */
     public function update(User $user, Employee $employee): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -45,7 +43,7 @@ class EmployeePolicy
      */
     public function delete(User $user, Employee $employee): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -53,7 +51,7 @@ class EmployeePolicy
      */
     public function restore(User $user, Employee $employee): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -61,6 +59,6 @@ class EmployeePolicy
      */
     public function forceDelete(User $user, Employee $employee): bool
     {
-        return false;
+        return $user->isAdmin();
     }
-}
+ }
