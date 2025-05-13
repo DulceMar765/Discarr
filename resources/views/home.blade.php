@@ -129,12 +129,30 @@
         }
 
         .service-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+          position: relative;
+          overflow: hidden;
         }
 
-        .service-card:hover {
-        transform: translateY(-15px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        .service-overlay {
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(30,30,30,0.95);
+          color: #fff;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s;
+          padding: 2rem;
+          text-align: center;
+          z-index: 2;
+        }
+
+        .service-card:hover .service-overlay {
+          opacity: 1;
+          pointer-events: auto;
         }
 
     </style>
@@ -230,23 +248,61 @@
         <div class="carousel-item active">
           <div class="row g-4 justify-content-center">
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100" style="background-color: rgba(0, 0, 0, 0.6);">
+              <div class="card service-card text-white border-0 shadow-lg h-100"
+                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
                 <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
                   <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Cajas para Camioneta y Camión</div>
                 </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100" style="background-color: rgba(0, 0, 0, 0.6);">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Maquilado de Metales</div>
+                <div class="service-overlay">
+                  <h3>Cajas para Camioneta y Camión</h3>
+                  <ul class="text-start">
+                    <li>Caja Seca</li>
+                    <li>Caja Aislada para Refrigeracion</li>
+                    <li>Caja Ganadera</li>
+                    <li>Caja de Redilas (redilas estandar, cerradas, de duela metálica)</li>
+                    <li>Caja Pesquera</li>
+                    <li>Caja Carnicera</li>
+                    <li>Caja Garrafonera</li>
+                  </ul>
                 </div>
               </div>
             </div>
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100" style="background-color: rgba(0, 0, 0, 0.6);">
+              <div class="card service-card text-white border-0 shadow-lg h-100"
+                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
+                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
+                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Maquilado de Metales</div>
+                </div>
+                <div class="service-overlay">
+                  <h3>Maquilado de Metales</h3>
+                  <ul class="text-start">
+                    <li>Dobladora de placa y tubo</li>
+                    <li>Roladora de placa y tubo</li>
+                    <li>Corte de placa y tubo</li>
+                    <li>Troquelado de placa</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card service-card text-white border-0 shadow-lg h-100"
+                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
                 <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
                   <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Remolques</div>
+                </div>
+                <div class="service-overlay">
+                  <h3>Remolques</h3>
+                  <ul class="text-start">
+                    <li>Cama Baja</li>
+                    <li>Ganaderos</li>
+                    <li>Para Razer</li>
+                    <li>De 1 y 2 Ejes</li>
+                    <li>Caja Seca de 1 y 2 Ejes</li>
+                    <li>Remolques Con Redilas</li>
+                    <li>Remolques Cuello de Ganzo</li>
+                    <li>Dolly de Arrastre</li>
+                    <li>Campers</li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -257,23 +313,54 @@
         <div class="carousel-item">
           <div class="row g-4 justify-content-center">
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100" style="background-color: rgba(0, 0, 0, 0.6);">
+              <div class="card service-card text-white border-0 shadow-lg h-100"
+                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
                 <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
                   <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Corte Plasma CNC</div>
                 </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100" style="background-color: rgba(0, 0, 0, 0.6);">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Herrería con Diseño</div>
+                <div class="service-overlay">
+                  <h3>Corte Plasma CNC</h3>
+                  <ul class="text-start">
+                    <h5>Pantógrafo</h5>
+                    <li>Corte de placa hasta una dimensión de 2x12 mts en 5/8</li>
+                    <li>Oxicorte de placa hasta una dimensión de 3x12 y 2" de espesor</li>
+                    <li>Corte arco aire</li>
+                  </ul>
                 </div>
               </div>
             </div>
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100" style="background-color: rgba(0, 0, 0, 0.6);">
+              <div class="card service-card text-white border-0 shadow-lg h-100"
+                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
+                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
+                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Herrería con Diseño</div>
+                </div>
+                <div class="service-overlay">
+                  <h3>Herrería con Diseño</h3>
+                  <ul class="text-start">
+                    <li>Barandales</li>
+                    <li>Celosías</li>
+                    <li>Portones</li>
+                    <li>Escaleras</li>
+                    <li>Fachas</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card service-card text-white border-0 shadow-lg h-100"
+                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
                 <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
                   <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Estructuras</div>
+                </div>
+                <div class="service-overlay">
+                  <h3>Estructuras</h3>
+                  <ul class="text-start">
+                    <li>Techumbres</li>
+                    <li>Galeras</li>
+                    <li>Arco Techos</li>
+                    <li>Naves Industriales</li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -284,35 +371,52 @@
         <div class="carousel-item">
           <div class="row g-4 justify-content-center">
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100" style="background-color: rgba(0, 0, 0, 0.6);">
+              <div class="card service-card text-white border-0 shadow-lg h-100"
+                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
                 <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
                   <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Semirremolques</div>
+                </div>
+                <div class="service-overlay">
+                  <h3>Semirremolques</h3>
+                  <ul class="text-start">
+                    <li>Plana</li>
+                    <li>Góndola de Volteo</li>
+                    <li>Porta Contenedor</li>
+                    <li>Lowboy - Cama Baja</li>
+                    <li>Dollys</li>
+                    <li>Caja Seca</li>
+                  </ul>
                 </div>
               </div>
             </div>
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100" style="background-color: rgba(0, 0, 0, 0.6);">
+              <div class="card service-card text-white border-0 shadow-lg h-100"
+                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
                 <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
                   <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Renta de Oficinas Móviles</div>
+                </div>
+                <div class="service-overlay">
+                  <h3>Renta de Oficinas Móviles</h3>
+                  <ul class="text-start">
+                    <li>Remolque Oficina</li>
+                    <li>Baño móvil</li>
+                    <li>Camper Habitacional</li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
-<!-- Controles -->
-<button class="carousel-control-prev" type="button" data-bs-target="#serviciosCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#serviciosCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-      </button>
+        <!-- Controles -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#serviciosCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#serviciosCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
       </div>
     </div>
   </div>
 </section>
-     
-
-
-
 
 @endsection
