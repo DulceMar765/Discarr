@@ -209,5 +209,8 @@
     @stack('scripts')
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
+    <!-- Yield para scripts adicionales -->
+    @yield('page_scripts')
 </body>
 </html>
