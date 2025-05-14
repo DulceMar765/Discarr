@@ -195,7 +195,7 @@
 <!-- Quiénes Somos Section -->
 <section id="apartados" class="py-5">
     <div class="container">
-        <h2 class="section-title">Quiénes Somos</h2>
+        <h1 class="section-title">¿Quiénes somos?</h1>
         <p class="mb-4 text-white">
             Somos una empresa de mas de 40 años de experiencia, dedicadas a la fabricación de carrocerías, como son; cajas secas, cajas ganaderas, cajas de redilas, estaquitas, plataformas, remolques, semirremolques, campers, góndolas de volteo y pipas.
             Brindamos también diferentes servicios de la industria metalúrgica como lo son: corte, doblado, rolado y triquel de placa.
@@ -248,63 +248,69 @@
         <div class="carousel-item active">
           <div class="row g-4 justify-content-center">
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100"
-                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Cajas para Camioneta y Camión</div>
+              <a href="{{ route('servicios.cajas-camioneta') }}" style="text-decoration:none;">
+                <div class="card service-card text-white border-0 shadow-lg h-100"
+                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
+                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
+                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Cajas para Camioneta y Camión</div>
+                  </div>
+                  <div class="service-overlay">
+                    <h3>Cajas para Camioneta y Camión</h3>
+                    <ul class="text-start">
+                      <li>Caja Seca</li>
+                      <li>Caja Aislada para Refrigeracion</li>
+                      <li>Caja Ganadera</li>
+                      <li>Caja de Redilas (redilas estandar, cerradas, de duela metálica)</li>
+                      <li>Caja Pesquera</li>
+                      <li>Caja Carnicera</li>
+                      <li>Caja Garrafonera</li>
+                    </ul>
+                  </div>
                 </div>
-                <div class="service-overlay">
-                  <h3>Cajas para Camioneta y Camión</h3>
-                  <ul class="text-start">
-                    <li>Caja Seca</li>
-                    <li>Caja Aislada para Refrigeracion</li>
-                    <li>Caja Ganadera</li>
-                    <li>Caja de Redilas (redilas estandar, cerradas, de duela metálica)</li>
-                    <li>Caja Pesquera</li>
-                    <li>Caja Carnicera</li>
-                    <li>Caja Garrafonera</li>
-                  </ul>
-                </div>
-              </div>
+              </a>
             </div>
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100"
-                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Maquilado de Metales</div>
+              <a href="{{ route('servicios.maquilado-metales') }}" style="text-decoration:none;">
+                <div class="card service-card text-white border-0 shadow-lg h-100"
+                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
+                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
+                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Maquilado de Metales</div>
+                  </div>
+                  <div class="service-overlay">
+                    <h3>Maquilado de Metales</h3>
+                    <ul class="text-start">
+                      <li>Dobladora de placa y tubo</li>
+                      <li>Roladora de placa y tubo</li>
+                      <li>Corte de placa y tubo</li>
+                      <li>Troquelado de placa</li>
+                    </ul>
+                  </div>
                 </div>
-                <div class="service-overlay">
-                  <h3>Maquilado de Metales</h3>
-                  <ul class="text-start">
-                    <li>Dobladora de placa y tubo</li>
-                    <li>Roladora de placa y tubo</li>
-                    <li>Corte de placa y tubo</li>
-                    <li>Troquelado de placa</li>
-                  </ul>
-                </div>
-              </div>
+              </a>
             </div>
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100"
-                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Remolques</div>
+              <a href="{{ route('servicios.remolques') }}" style="text-decoration:none;">
+                <div class="card service-card text-white border-0 shadow-lg h-100"
+                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
+                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
+                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Remolques</div>
+                  </div>
+                  <div class="service-overlay">
+                    <h3>Remolques</h3>
+                    <ul class="text-start">
+                      <li>Cama Baja</li>
+                      <li>Ganaderos</li>
+                      <li>Para Razer</li>
+                      <li>De 1 y 2 Ejes</li>
+                      <li>Caja Seca de 1 y 2 Ejes</li>
+                      <li>Remolques Con Redilas</li>
+                      <li>Remolques Cuello de Ganzo</li>
+                      <li>Dolly de Arrastre</li>
+                      <li>Campers</li>
+                    </ul>
+                  </div>
                 </div>
-                <div class="service-overlay">
-                  <h3>Remolques</h3>
-                  <ul class="text-start">
-                    <li>Cama Baja</li>
-                    <li>Ganaderos</li>
-                    <li>Para Razer</li>
-                    <li>De 1 y 2 Ejes</li>
-                    <li>Caja Seca de 1 y 2 Ejes</li>
-                    <li>Remolques Con Redilas</li>
-                    <li>Remolques Cuello de Ganzo</li>
-                    <li>Dolly de Arrastre</li>
-                    <li>Campers</li>
-                  </ul>
-                </div>
-              </div>
+              </a>
             </div>
           </div>
         </div>
@@ -313,6 +319,7 @@
         <div class="carousel-item">
           <div class="row g-4 justify-content-center">
             <div class="col-md-3">
+              <!-- Sin <a> porque ya no existe la ruta -->
               <div class="card service-card text-white border-0 shadow-lg h-100"
                    style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
                 <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
@@ -330,6 +337,7 @@
               </div>
             </div>
             <div class="col-md-3">
+              <!-- Sin <a> porque ya no existe la ruta -->
               <div class="card service-card text-white border-0 shadow-lg h-100"
                    style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
                 <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
@@ -348,6 +356,7 @@
               </div>
             </div>
             <div class="col-md-3">
+              <!-- Sin <a> porque ya no existe la ruta -->
               <div class="card service-card text-white border-0 shadow-lg h-100"
                    style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
                 <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
@@ -371,39 +380,43 @@
         <div class="carousel-item">
           <div class="row g-4 justify-content-center">
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100"
-                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Semirremolques</div>
+              <a href="{{ route('servicios.semirremolques') }}" style="text-decoration:none;">
+                <div class="card service-card text-white border-0 shadow-lg h-100"
+                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
+                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
+                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Semirremolques</div>
+                  </div>
+                  <div class="service-overlay">
+                    <h3>Semirremolques</h3>
+                    <ul class="text-start">
+                      <li>Plana</li>
+                      <li>Góndola de Volteo</li>
+                      <li>Porta Contenedor</li>
+                      <li>Lowboy - Cama Baja</li>
+                      <li>Dollys</li>
+                      <li>Caja Seca</li>
+                    </ul>
+                  </div>
                 </div>
-                <div class="service-overlay">
-                  <h3>Semirremolques</h3>
-                  <ul class="text-start">
-                    <li>Plana</li>
-                    <li>Góndola de Volteo</li>
-                    <li>Porta Contenedor</li>
-                    <li>Lowboy - Cama Baja</li>
-                    <li>Dollys</li>
-                    <li>Caja Seca</li>
-                  </ul>
-                </div>
-              </div>
+              </a>
             </div>
             <div class="col-md-3">
-              <div class="card service-card text-white border-0 shadow-lg h-100"
-                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Renta de Oficinas Móviles</div>
+              <a href="{{ route('servicios.renta-oficinas-moviles') }}" style="text-decoration:none;">
+                <div class="card service-card text-white border-0 shadow-lg h-100"
+                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
+                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
+                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Renta de Oficinas Móviles</div>
+                  </div>
+                  <div class="service-overlay">
+                    <h3>Renta de Oficinas Móviles</h3>
+                    <ul class="text-start">
+                      <li>Remolque Oficina</li>
+                      <li>Baño móvil</li>
+                      <li>Camper Habitacional</li>
+                    </ul>
+                  </div>
                 </div>
-                <div class="service-overlay">
-                  <h3>Renta de Oficinas Móviles</h3>
-                  <ul class="text-start">
-                    <li>Remolque Oficina</li>
-                    <li>Baño móvil</li>
-                    <li>Camper Habitacional</li>
-                  </ul>
-                </div>
-              </div>
+              </a>
             </div>
           </div>
         </div>

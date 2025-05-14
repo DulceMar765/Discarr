@@ -158,8 +158,6 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
                     <li class="nav-item"><a class="nav-link" href="/nosotros">Nosotros</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/servicios">Servicios</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/portafolio">Portafolio</a></li>
                     <li class="nav-item"><a class="nav-link" href="/appointments/create">Reservaciones</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contacto">Contacto</a></li>
                 </ul>
@@ -195,8 +193,6 @@
             <div class="footer-links mb-3">
                 <a href="/">Inicio</a> |
                 <a href="/nosotros">Nosotros</a> |
-                <a href="/servicios">Servicios</a> |
-                <a href="/portafolio">Portafolio</a> |
                 <a href="/contacto">Contacto</a>
             </div>
             <div class="social-links mb-3">
@@ -213,5 +209,8 @@
     @stack('scripts')
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
+    <!-- Yield para scripts adicionales -->
+    @yield('page_scripts')
 </body>
 </html>

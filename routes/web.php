@@ -217,21 +217,43 @@ Route::middleware('auth')->group(function () {
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employee.index');
     Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employee.create');
     Route::post('/employees', [EmployeeController::class, 'store'])->name('employee.store');
-    
+
     // Rutas para editar y actualizar un empleado
     Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employee.edit');
     Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employee.update');
-    
+
     // Ruta para eliminar un empleado
     Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 });
 
+<<<<<<< HEAD
 // Recurso completo con rutas RESTful
 Route::resource('vacations', VacationController::class);
 
 
 
+=======
+// Servicios adicionales
+Route::get('/servicios/cajas-camioneta', function () {
+    return view('servicios.cajas-camioneta');
+})->name('servicios.cajas-camioneta');
+>>>>>>> afb4657471a9bb0bad0c356f220ed74384ef7f69
 
+Route::get('/servicios/maquilado-metales', function () {
+    return view('servicios.maquilado-metales');
+})->name('servicios.maquilado-metales');
+
+Route::get('/servicios/remolques', function () {
+    return view('servicios.remolques');
+})->name('servicios.remolques');
+
+Route::get('/servicios/semirremolques', function () {
+    return view('servicios.semirremolques');
+})->name('servicios.semirremolques');
+
+Route::get('/servicios/renta-oficinas-moviles', function () {
+    return view('servicios.renta-oficinas-moviles');
+})->name('servicios.renta-oficinas-moviles');
 
 // Rutas de autenticación de Laravel
 require __DIR__.'/auth.php';
