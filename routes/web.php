@@ -226,18 +226,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 });
 
-<<<<<<< HEAD
 // Recurso completo con rutas RESTful
 Route::resource('vacations', VacationController::class);
 
-
-
-=======
 // Servicios adicionales
 Route::get('/servicios/cajas-camioneta', function () {
     return view('servicios.cajas-camioneta');
 })->name('servicios.cajas-camioneta');
->>>>>>> afb4657471a9bb0bad0c356f220ed74384ef7f69
 
 Route::get('/servicios/maquilado-metales', function () {
     return view('servicios.maquilado-metales');
