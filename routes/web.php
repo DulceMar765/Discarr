@@ -15,6 +15,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProjectMailController;
 use App\Http\Controllers\ProjectQRController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\VacationController;
 
 // Página principal
 Route::get('/', function () {
@@ -224,6 +225,9 @@ Route::middleware('auth')->group(function () {
     // Ruta para eliminar un empleado
     Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 });
+
+// Recurso completo con rutas RESTful
+Route::resource('vacations', VacationController::class);
 
 // Servicios adicionales
 Route::get('/servicios/cajas-camioneta', function () {

@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('content')
 <!-- Hero Section -->
 <section class="hero position-relative">
