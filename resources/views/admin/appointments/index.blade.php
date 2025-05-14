@@ -61,11 +61,14 @@
                                     // Agrupar citas por fecha
                                     $appointmentsByDate = [];
                                     foreach ($appointments as $appointment) {
-                                        $date = $appointment->calendar_day->date;
-                                        if (!isset($appointmentsByDate[$date])) {
-                                            $appointmentsByDate[$date] = [];
+                                        // Verificar que calendar_day no sea nulo antes de acceder a date
+                                        if ($appointment->calendar_day) {
+                                            $date = $appointment->calendar_day->date;
+                                            if (!isset($appointmentsByDate[$date])) {
+                                                $appointmentsByDate[$date] = [];
+                                            }
+                                            $appointmentsByDate[$date][] = $appointment;
                                         }
-                                        $appointmentsByDate[$date][] = $appointment;
                                     }
                                     // Ordenar por fecha
                                     ksort($appointmentsByDate);

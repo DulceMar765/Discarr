@@ -155,8 +155,28 @@
             $.ajax({
                 url: url,
                 type: 'GET',
+                dataType: 'html',
                 success: function(response) {
+                    // Limpiar cualquier script previo
+                    $('#admin-content').empty();
+                    
+                    // Insertar el nuevo contenido
                     $('#admin-content').html(response);
+                    
+                    // Ejecutar scripts después de cargar el contenido
+                    setTimeout(function() {
+                        try {
+                            // Inicializar calendario si existe la función
+                            if (typeof initCalendar === 'function') {
+                                initCalendar();
+                            }
+                            
+                            // Ejecutar otros scripts que puedan necesitar inicialización
+                            // Aquí se pueden añadir más inicializaciones si es necesario
+                        } catch (e) {
+                            console.error('Error al inicializar scripts:', e);
+                        }
+                    }, 300);
                 },
                 error: function(xhr) {
                     $('#admin-content').html('<div class="alert alert-danger">Error al cargar el contenido.</div>');

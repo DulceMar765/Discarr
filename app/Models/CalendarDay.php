@@ -20,6 +20,12 @@ class CalendarDay extends Model
         'booked_slots',
         'total_slots',
         'manual_override',
+        'available_slots',
+    ];
+
+    // Casteo de atributos
+    protected $casts = [
+        'available_slots' => 'array',
     ];
 
     // Relación con las citas
