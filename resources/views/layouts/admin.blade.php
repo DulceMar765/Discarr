@@ -124,6 +124,10 @@
         <a class="nav-link" href="{{ route('admin.projects.index') }}">
             <i class="bi bi-folder-fill"></i> Proyectos
         </a>
+        <a class="nav-link" href="#" onclick="loadAdminSection('{{ route('vacations.index') }}'); return false;">
+             <i class="bi bi-calendar-plus"></i> Vacaciones
+        </a>
+
 
         <div class="logout mt-auto">
             <form action="{{ route('logout') }}" method="POST">

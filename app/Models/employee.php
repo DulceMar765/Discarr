@@ -25,4 +25,10 @@ class Employee extends Model
         'salary' => 'decimal:2',
         'status' => 'boolean'
     ];
+
+    public function vacations()
+   {
+    return $this->hasMany(Vacation::class);
+   }
+
 }
