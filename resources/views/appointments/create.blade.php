@@ -29,8 +29,11 @@
                             <!-- Columna del Calendario -->
                             <div class="col-lg-7">
                                 <div class="card bg-dark border-secondary mb-4">
-                                    <div class="card-header bg-secondary bg-opacity-50 text-white">
+                                    <div class="card-header bg-secondary bg-opacity-50 text-white d-flex justify-content-between align-items-center">
                                         <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Selecciona una Fecha</h5>
+                                        <button type="button" id="refresh-calendar-btn" class="btn btn-sm btn-outline-light" title="Actualizar calendario">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
                                     </div>
                                     <div class="card-body">
                                         <!-- Calendario -->
@@ -134,8 +137,59 @@
 </div>
 @section('page_scripts')
 <script>
+    // Variable global para el calendario
+    let clientCalendar;
+    let timestamp = new Date().getTime();
+    
+    // Función para recargar forzadamente el calendario
+    function forceCalendarRefresh() {
+        timestamp = new Date().getTime(); // Generar nuevo timestamp
+        console.log('Forzando actualización completa del calendario, timestamp:', timestamp);
+        
+        // Mostrar indicador de carga
+        const refreshBtn = document.getElementById('refresh-calendar-btn');
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        }
+        
+        // Realizar una petición al servidor con cache-busting
+        fetch('/appointments/create?refresh=' + timestamp + '&force=true', {
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        })
+        .then(response => {
+            console.log('Respuesta de recarga forzada:', response.status);
+            // Recargar la página completa para asegurar datos frescos
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error al refrescar datos:', error);
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+            }
+        });
+    }
+    
     // Esperar a que se carguen todos los recursos necesarios
     window.addEventListener('load', function() {
+        console.log('Página de citas cargada, timestamp:', timestamp);
+        
+        // Asignar evento al botón de refrescar
+        const refreshBtn = document.getElementById('refresh-calendar-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', forceCalendarRefresh);
+        }
+        
+        // Forzar recarga de datos del calendario al inicio
+        fetch('/appointments/create?refresh=' + timestamp)
+        .then(response => console.log('Respuesta de refrescar datos inicial:', response.status))
+        .catch(error => console.error('Error al refrescar datos:', error));
+        
         // Verificar que FullCalendar esté disponible
         if (typeof FullCalendar === 'undefined') {
             console.error('FullCalendar no está cargado. Cargando desde CDN...');
@@ -291,12 +345,17 @@
                     console.log(`Solicitando slots disponibles para ${dateStr} al servidor`);
                     
                     // Realizar una petición AJAX para obtener los slots actualizados
-                    fetch(`/appointments/get-available-slots?date=${dateStr}`, {
+                    // Añadir timestamp para evitar caché
+                    const fetchTimestamp = new Date().getTime();
+                    fetch(`/appointments/get-available-slots?date=${dateStr}&_=${fetchTimestamp}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache',
+                            'Expires': '0'
                         }
                     })
                     .then(response => response.json())

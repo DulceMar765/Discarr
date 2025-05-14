@@ -29,16 +29,55 @@ class AppointmentsController extends Controller
     }
 
     // Crear una nueva cita
-    public function create(Request $request)
-    {
-        // Verificar que el usuario esté autenticado
+    public function create(Request $request) {
+        // Agregar encabezados para evitar caché en la respuesta
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Cache-Control: post-check=0, pre-check=0', false);
+        header('Pragma: no-cache');
+        
+        // Validar si el usuario está autenticado
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para realizar una reservación.');
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para solicitar una cita.');
         }
         
-        // Verificar que el usuario tenga el rol de cliente
-        if (Auth::user()->role !== 'cliente') {
-            return redirect()->route('home')->with('error', 'Solo los clientes pueden realizar reservaciones.');
+        // Validar si el usuario es cliente (verificar ambos: 'client' o 'cliente')
+        if (Auth::user()->role !== 'client' && Auth::user()->role !== 'cliente') {
+            // Registrar el rol para depuración
+            \Log::info("Intento de acceso a reservaciones con rol no permitido: " . Auth::user()->role);
+            return redirect()->route('home')->with('error', 'Solo los clientes pueden solicitar citas.');
+        }
+        
+        // Registrar acceso exitoso
+        \Log::info("Acceso exitoso a reservaciones por usuario " . Auth::user()->name . " con rol " . Auth::user()->role);
+        
+        // Si tenemos un parámetro refresh, recomputamos los calendar_days
+        if ($request->has('refresh')) {
+            $forceUpdate = $request->has('force') && $request->force === 'true';
+            \Log::info("Forzando recalculación de datos de calendario por refresh={$request->refresh}, force={$forceUpdate}");
+            
+            // Si se solicita una actualización forzada, limpiar caché de manera más agresiva
+            if ($forceUpdate) {
+                \Log::info("Actualización forzada solicitada: limpiando caché agresivamente");
+                // Limpiar caché de manera agresiva
+                DB::statement('SET FOREIGN_KEY_CHECKS=0');
+                try {
+                    // Actualizar manualmente los días con cambios recientes
+                    $recentlyUpdatedDays = CalendarDay::where('updated_at', '>=', now()->subMinutes(30))->get();
+                    foreach ($recentlyUpdatedDays as $day) {
+                        \Log::info("Recargando manualmente día {$day->date} con ID {$day->id}");
+                        // Recalcular slots disponibles
+                        $day->refresh();
+                        // Forzar recalcular estado de disponibilidad
+                        $day->availability_status = $this->calculateAvailabilityStatus($day);
+                        $day->save();
+                    }
+                } finally {
+                    DB::statement('SET FOREIGN_KEY_CHECKS=1');
+                }
+            }
+            
+            // Actualizar el estado de todos los días del calendario
+            $this->updateAllCalendarDays();
         }
         
         // Elimina los días pasados
@@ -692,17 +731,24 @@ class AppointmentsController extends Controller
                 
                 DB::commit();
                 
-                // Devolver respuesta exitosa
+                // Obtener datos actualizados del calendario para devolver junto con la respuesta
+                $calendarData = $this->calendarData();
+                
+                // Devolver respuesta exitosa con los datos actualizados del calendario
                 return response()->json([
                     'success' => true, 
                     'message' => 'Configuración guardada correctamente',
+                    'calendarData' => $calendarData,
+                    'updatedDate' => $request->date,
+                    'needsRefresh' => true,
                     'debug' => [
                         'id' => $verifyDay->id,
                         'date' => $request->date,
                         'status' => $request->status,
                         'availability_status' => $verifyDay->availability_status,
                         'manual_override' => $verifyDay->manual_override,
-                        'available_slots' => $verifyDay->getRawOriginal('available_slots')
+                        'available_slots' => $verifyDay->getRawOriginal('available_slots'),
+                        'timestamp' => time() // Añadir timestamp para evitar caché
                     ]
                 ]);
             } catch (\Exception $e) {
@@ -731,80 +777,80 @@ class AppointmentsController extends Controller
     }
     
     // Obtener los horarios disponibles para una fecha específica
-    public function getAvailableSlots(Request $request)
-    {
+    public function getAvailableSlots(Request $request) {
         try {
+            // Establecer encabezados para evitar caché
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Pragma: no-cache');
+            header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+            
             // Validar la fecha
-            $validator = Validator::make($request->all(), [
-                'date' => 'required|date',
+            $request->validate([
+                'date' => 'required|date_format:Y-m-d',
             ]);
             
-            // Si la validación falla, devolver errores
-            if ($validator->fails()) {
-                return response()->json(['success' => false, 'message' => $validator->errors()->first()], 422);
+            $date = $request->date;
+            $timestamp = time();
+            \Log::info("API - Solicitando horarios disponibles para {$date}, timestamp: {$timestamp}");
+            
+            // Buscar el día en la base de datos con una consulta fresca
+            $calendarDay = CalendarDay::where('date', $date)->first();
+            
+            if (!$calendarDay) {
+                // Si el día no existe en la BD, crear uno con valores predeterminados
+                \Log::info("API - Día {$date} no encontrado en la base de datos, generando uno predeterminado");
+                return response()->json(['success' => true, 'slots' => $this->generateDefaultTimeSlots(), 'generated' => true]);
             }
             
-            // Registrar la solicitud para depuración
-            \Log::info("Solicitud de horarios disponibles para la fecha: {$request->date}");
+            // Registrar el estado del día encontrado
+            \Log::info("API - Día encontrado para {$date}:", [
+                'id' => $calendarDay->id,
+                'availability_status' => $calendarDay->availability_status,
+                'manual_override' => $calendarDay->manual_override ? 'Sí' : 'No',
+                'available_slots' => json_encode($calendarDay->available_slots)
+            ]);
             
-            // Buscar el día en la base de datos
-            $calendarDay = CalendarDay::where('date', $request->date)->first();
-            
-            if ($calendarDay) {
-                // Registrar el estado del día encontrado
-                \Log::info("Día encontrado para {$request->date}:", [
-                    'id' => $calendarDay->id,
-                    'availability_status' => $calendarDay->availability_status,
-                    'manual_override' => $calendarDay->manual_override ? 'Sí' : 'No',
-                    'available_slots' => json_encode($calendarDay->available_slots)
-                ]);
+            // Verificar si el día está disponible (no es rojo ni negro/festivo)
+            if ($calendarDay->availability_status != 'red' && $calendarDay->availability_status != 'black') {
+                // Forzar recarga de datos desde la base de datos para asegurar que tenemos los datos más recientes
+                $calendarDay = CalendarDay::find($calendarDay->id);
                 
-                // Verificar si el día está disponible (no es rojo ni negro/festivo)
-                if ($calendarDay->availability_status != 'red' && $calendarDay->availability_status != 'black') {
-                    // Forzar recarga de datos desde la base de datos para asegurar que tenemos los datos más recientes
-                    $calendarDay = CalendarDay::find($calendarDay->id);
-                    
-                    // Obtener los slots disponibles respetando lo que está en la base de datos
-                    $rawSlots = $calendarDay->getRawOriginal('available_slots');
-                    \Log::info("API - Raw slots de la base de datos para {$calendarDay->date}: " . $rawSlots);
-                    
-                    $availableSlots = [];
-                    if (!empty($rawSlots)) {
-                        // Si hay datos JSON en la columna available_slots, utilizarlos
-                        $availableSlots = json_decode($rawSlots, true);
-                        \Log::info("API - Slots JSON decodificados para {$calendarDay->date}: " . json_encode($availableSlots));
-                    } else {
-                        // Si no hay nada en la columna available_slots, intentar usar el método calculated_available_slots
-                        $availableSlots = $calendarDay->calculated_available_slots;
-                        \Log::info("API - Slots calculados para {$calendarDay->date}: " . json_encode($availableSlots));
-                        
-                        // Si aún no hay slots, generar por defecto
-                        if (empty($availableSlots)) {
-                            $availableSlots = $this->generateDefaultTimeSlots();
-                            \Log::info("API - Generando slots por defecto para {$calendarDay->date}: " . json_encode($availableSlots));
-                        }
-                    }
-                    
-                    // Filtrar slots que ya están reservados
-                    $bookedSlots = Appointment::where('calendar_day_id', $calendarDay->id)
-                        ->where('status', 'confirmed')
-                        ->pluck('time_slot')
-                        ->toArray();
-                    
-                    // Eliminar los slots ya reservados de los disponibles
-                    $availableSlots = is_array($availableSlots) ? array_values(array_diff($availableSlots, $bookedSlots)) : [];
-                    \Log::info("API - Slots disponibles finales para {$calendarDay->date}: " . json_encode($availableSlots));
-                    
-                    return response()->json(['success' => true, 'slots' => $availableSlots]);
+                // Obtener los slots disponibles respetando lo que está en la base de datos
+                $rawSlots = $calendarDay->getRawOriginal('available_slots');
+                \Log::info("API - Raw slots de la base de datos para {$calendarDay->date}: " . $rawSlots);
+                
+                $availableSlots = [];
+                if (!empty($rawSlots)) {
+                    // Si hay datos JSON en la columna available_slots, utilizarlos
+                    $availableSlots = json_decode($rawSlots, true);
+                    \Log::info("API - Slots JSON decodificados para {$calendarDay->date}: " . json_encode($availableSlots));
                 } else {
-                    // Si el día no está disponible, devolver un array vacío
-                    \Log::info("Día no disponible: {$calendarDay->availability_status}");
-                    return response()->json(['success' => true, 'slots' => []]);
+                    // Si no hay nada en la columna available_slots, intentar usar el método calculated_available_slots
+                    $availableSlots = $calendarDay->calculated_available_slots;
+                    \Log::info("API - Slots calculados para {$calendarDay->date}: " . json_encode($availableSlots));
+                    
+                    // Si aún no hay slots, generar por defecto
+                    if (empty($availableSlots)) {
+                        $availableSlots = $this->generateDefaultTimeSlots();
+                        \Log::info("API - Generando slots por defecto para {$calendarDay->date}: " . json_encode($availableSlots));
+                    }
                 }
+                
+                // Filtrar slots que ya están reservados
+                $bookedSlots = Appointment::where('calendar_day_id', $calendarDay->id)
+                    ->where('status', 'confirmed')
+                    ->pluck('time_slot')
+                    ->toArray();
+                
+                // Eliminar los slots ya reservados de los disponibles
+                $availableSlots = is_array($availableSlots) ? array_values(array_diff($availableSlots, $bookedSlots)) : [];
+                \Log::info("API - Slots disponibles finales para {$calendarDay->date}: " . json_encode($availableSlots));
+                
+                return response()->json(['success' => true, 'slots' => $availableSlots]);
             } else {
-                // Si el día no existe en la base de datos
-                \Log::info("Día no encontrado en la base de datos: {$request->date}");
-                return response()->json(['success' => true, 'slots' => $this->generateDefaultTimeSlots()]);
+                // Si el día no está disponible, devolver un array vacío
+                \Log::info("Día no disponible: {$calendarDay->availability_status}");
+                return response()->json(['success' => true, 'slots' => []]);
             }
         } catch (\Exception $e) {
             // Registrar cualquier error

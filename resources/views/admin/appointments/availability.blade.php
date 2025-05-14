@@ -396,8 +396,43 @@
                         alert('Configuración guardada correctamente');
                     }
                     
-                    // Recargar el calendario y actualizar estadísticas
-                    calendar.refetchEvents();
+                    // Recargar completamente el calendario con datos frescos
+                    if (data.calendarData) {
+                        console.log('Usando datos del calendario actualizados del servidor');
+                        // Eliminar todos los eventos actuales
+                        calendar.removeAllEvents();
+                        
+                        // Añadir los eventos con los datos actualizados
+                        data.calendarData.forEach(day => {
+                            const eventColor = getEventColor(day.availability_status);
+                            const selectable = day.availability_status !== 'black' && day.availability_status !== 'red';
+                            
+                            calendar.addEvent({
+                                title: getEventTitle(day),
+                                start: day.date,
+                                allDay: true,
+                                backgroundColor: eventColor,
+                                borderColor: eventColor,
+                                extendedProps: {
+                                    dayId: day.id,
+                                    status: day.availability_status,
+                                    availableSlots: day.available_slots,
+                                    manualOverride: day.manual_override
+                                },
+                                selectable: selectable,
+                                classNames: day.availability_status === 'black' ? ['holiday-event'] : []
+                            });
+                        });
+                    } else {
+                        // Si no hay datos en la respuesta, simplemente actualizar eventos
+                        console.log('Refrescando eventos del calendario');
+                        calendar.refetchEvents();
+                    }
+                    
+                    // Forzar renderizado del calendario
+                    calendar.render();
+                    
+                    // Actualizar estadísticas
                     updateStatistics();
                 } else {
                     alert('Error: ' + (data.message || 'No se pudo guardar la configuración'));
