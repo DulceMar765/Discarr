@@ -92,10 +92,10 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="{{ asset('img/maquilado1-1.jpg') }}" alt="Doblado 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/doblado-de-lamina.jpg') }}" alt="Doblado 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
             <div class="custom-card-img">
-                <img src="{{ asset('img/maquilado1-2.jpg') }}" alt="Doblado 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/doblado-lamina-negra.jpg') }}" alt="Doblado 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>
@@ -122,7 +122,7 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="{{ asset('img/maquilado2.jpg') }}" alt="Corte" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/maquila-corte.jpg') }}" alt="Corte" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>
@@ -148,7 +148,7 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="{{ asset('img/maquilado3.jpg') }}" alt="Caja de Redilas Estándar" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/caja-redilas.jpeg') }}" alt="Caja de Redilas Estándar" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>
@@ -175,10 +175,7 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="{{ asset('img/maquilado4-1.jpg') }}" alt="Cono o transición 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
-            </div>
-            <div class="custom-card-img">
-                <img src="{{ asset('img/maquilado4-2.jpg') }}" alt="Cono o transición 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cono-pieza.jpg') }}" alt="Cono o transición 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>

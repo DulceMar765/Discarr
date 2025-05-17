@@ -88,13 +88,13 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="{{ asset('img/plataforma1.jpg') }}" alt="Plataforma 1" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+                <img src="{{ asset('img/gondola-volteo.png') }}" alt="Plataforma 1" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
             </div>
             <div class="custom-card-img">
-                <img src="{{ asset('img/plataforma2.jpg') }}" alt="Plataforma 2" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+                <img src="{{ asset('img/semirremolque-plano.jpg') }}" alt="Plataforma 2" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
             </div>
             <div class="custom-card-img">
-                <img src="{{ asset('img/plataforma3.jpg') }}" alt="Plataforma 3" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+                <img src="{{ asset('img/semirremolque-caja-seca.png') }}" alt="Plataforma 3" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
             </div>
         </div>
     </div>
