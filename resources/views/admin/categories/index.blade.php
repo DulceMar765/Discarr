@@ -16,6 +16,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
+                        <th>Descripción</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -24,6 +25,7 @@
                     <tr id="category-row-{{ $category->id }}">
                         <td>{{ $category->id }}</td>
                         <td>{{ $category->name }}</td>
+                        <td>{{ $category->description }}</td> <!-- Mostrar descripción correctamente -->
                         <td>
                             <a href="#" onclick="loadAdminSection('{{ route('categories.edit', $category->id) }}'); return false;" class="btn btn-warning btn-sm">Editar</a>
                             
@@ -45,7 +47,6 @@
 <script>
 function deleteCategory(categoryId) {
     if (confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
-        // Obtener el formulario de eliminación correspondiente
         const form = document.getElementById('delete-form-' + categoryId);
 
         fetch(form.action, {
@@ -53,7 +54,7 @@ function deleteCategory(categoryId) {
             headers: {
                 'X-CSRF-TOKEN': form.querySelector('[name=_token]').value,
                 'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',  // Asegúrate de que la respuesta sea JSON
+                'Accept': 'application/json',
             },
             body: new FormData(form),
         })
@@ -61,7 +62,6 @@ function deleteCategory(categoryId) {
             if (response.status === 200) {
                 const data = await response.json();
                 if (data.success) {
-                    // Eliminar la fila de la tabla
                     document.getElementById('category-row-' + categoryId).remove();
                 }
             } else {
@@ -72,4 +72,3 @@ function deleteCategory(categoryId) {
     }
 }
 </script>
-

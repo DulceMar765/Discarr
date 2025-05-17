@@ -11,6 +11,11 @@
             <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $category->name) }}" required>
             <div id="name-error" class="text-danger"></div>
         </div>
+        <div class="mb-3">
+             <label for="description" class="form-label">Descripción</label>
+             <textarea class="form-control" id="description" name="description" rows="3" required>{{ old('description', $category->description) }}</textarea>
+            <div id="description-error" class="text-danger"></div>
+        </div>
         
         <button type="submit" class="btn btn-success">Actualizar</button>
         <a href="#" onclick="loadAdminSection('{{ route('categories.index') }}'); return false;" class="btn btn-secondary">Cancelar</a>

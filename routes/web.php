@@ -77,8 +77,7 @@ Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit')
 Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-// Ruta temporal para compatibilidad
-Route::get('/suppliers', [SupplierController::class, 'index'])->name('Suppliers.index');
+
 
 // Recursos principales
 Route::resource('supplier', SupplierController::class)->names([
@@ -225,6 +224,18 @@ Route::middleware('auth')->group(function () {
     // Ruta para eliminar un empleado
     Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 });
+
+//proveedores 
+Route::prefix('admin/supplier')->name('supplier.')->group(function() {
+    Route::get('/', [SupplierController::class, 'index'])->name('index');
+    Route::get('/create', [SupplierController::class, 'create'])->name('create');
+    Route::post('/', [SupplierController::class, 'store'])->name('store');
+    Route::get('/{supplier}', [SupplierController::class, 'show'])->name('show');
+    Route::get('/{supplier}/edit', [SupplierController::class, 'edit'])->name('edit');
+    Route::put('/{supplier}', [SupplierController::class, 'update'])->name('update');
+    Route::delete('/{supplier}', [SupplierController::class, 'destroy'])->name('destroy');
+});
+
 
 // Recurso completo con rutas RESTful
 Route::resource('vacations', VacationController::class);
