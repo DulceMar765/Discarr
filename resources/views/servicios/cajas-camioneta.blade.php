@@ -43,8 +43,8 @@
         align-items: flex-start;
     }
     .custom-card-img {
-        width: 180px;
-        height: 120px;
+        width: 270px;
+        height: 180px;
         object-fit: cover;
         border-radius: 12px;
         border: 2px solid #ff6600;
@@ -66,8 +66,8 @@
         }
         .custom-card-img {
             margin: 0;
-            width: 100px;
-            height: 70px;
+            width: 150px;
+            height: 105px;
         }
     }
 </style>
@@ -95,12 +95,46 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="ruta/a/imagen1.jpg" alt="Caja de Redilas Estándar" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cajas-camioneta/redilas1.jpg') }}" alt="Caja de Redilas Estándar" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+            </div>
+            <div class="custom-card-img">
+                <img src="{{ asset('img/cajas-camioneta/redilas2.jpg') }}" alt="Caja de Redilas Estándar" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>
 
-    <!-- Caja 2 (Caja Aislada Reforzada para Camión) -->
+        <!-- Caja 2 (Caja Aislada Especial) -->
+    <div class="custom-row">
+        <div class="custom-card">
+            <div class="custom-title">Caja Aislada Especial</div>
+            <ul class="custom-list">
+                <li><strong>Medidas Estándar:</strong></li>
+                <ul>
+                    <li>Largo: 3.05 mts</li>
+                    <li>Ancho: 2.44 mts</li>
+                    <li>Alto: 1.70 mts</li>
+                </ul>
+                <li>Estructura fabricada con laminas de varios calibres.</li>
+                <li>Largueros de monten de 6" cal.12 para mayor reforzamientos en chasis.</li>
+                <li>Plataforma con 5 cargadores cal.12 (1 al frente y 4 distribuidos).</li>
+                <li>Carrocería tipo abarrotera.</li>
+                <li>Piso de madera (normalmente es de manera, pero se fabrican al gusto del cliente).</li>
+                <li>Pintura general y anticorrosiva para mayor durabilidad del acero y madera.</li>
+                <li>Loderas blancas ya incluidas.</li>
+                <li>Puertas abatibles de madera.</li>
+            </ul>
+        </div>
+        <div class="custom-images-col">
+            <div class="custom-card-img">
+                <img src="{{ asset('img/cajas-camioneta/aislada-especial1.jpg') }}" alt="Caja Aislada Especial 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+            </div>
+            <div class="custom-card-img">
+                <img src="{{ asset('img/cajas-camioneta/aislada-especial2.jpg') }}" alt="Caja Aislada Especial 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Caja 3 (Caja Aislada Reforzada para Camión) -->
     <div class="custom-row">
         <div class="custom-card">
             <div class="custom-title">Caja Aislada Reforzada para Camión</div>
@@ -121,18 +155,15 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="ruta/a/camion1.jpg" alt="Caja Aislada Reforzada 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cajas-camioneta/aislada-reforzada1.jpg') }}" alt="Caja Aislada Reforzada 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
             <div class="custom-card-img">
-                <img src="ruta/a/camion2.jpg" alt="Caja Aislada Reforzada 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
-            </div>
-            <div class="custom-card-img">
-                <img src="ruta/a/camion3.jpg" alt="Caja Aislada Reforzada 3" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cajas-camioneta/aislada-reforzada2.jpg') }}" alt="Caja Aislada Reforzada 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>
 
-    <!-- Caja 3 -->
+    <!-- Caja 4 (Caja Abarrotera) -->
     <div class="custom-row">
         <div class="custom-card">
             <div class="custom-title">Caja Abarrotera</div>
@@ -157,49 +188,47 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="ruta/a/abarrotera1.jpg" alt="Caja Abarrotera 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cajas-camioneta/abarrotera1.jpg') }}" alt="Caja Abarrotera 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
             <div class="custom-card-img">
-                <img src="ruta/a/abarrotera2.jpg" alt="Caja Abarrotera 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cajas-camioneta/abarrotera2.jpg') }}" alt="Caja Abarrotera 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
             <div class="custom-card-img">
-                <img src="ruta/a/abarrotera3.jpg" alt="Caja Abarrotera 3" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cajas-camioneta/abarrotera3.jpg') }}" alt="Caja Abarrotera 3" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>
 
-    <!-- Caja 4 -->
+    <!-- Caja 5 (Caja Seca con Copete) -->
     <div class="custom-row">
         <div class="custom-card">
             <div class="custom-title">Caja Seca con Copete</div>
             <ul class="custom-list">
                 <li><strong>Medidas Estándar:</strong></li>
                 <ul>
-                    <li>Largo: 3.05 mts</li>
-                    <li>Ancho: 2.44 mts</li>
-                    <li>Alto: 2.00 mts</li>
-                    <li>Copete: 1.00 mts</li>
+                    <li>Largo: 2.44 mts</li>
+                    <li>Ancho: 1.85 mts</li>
+                    <li>Alto: 1.60 mts</li>
                 </ul>
-                <li>Carrocería tipo seca con copete.</li>
-                <li>Estructura fabricada con lámina de varios calibres.</li>
-                <li>Largueros de 1/8" de espesor.</li>
-                <li>Plataforma fabricada con lámina de cal.12 con 6 cargadores distribuidos correctamente.</li>
+                <li>2" de poliuretano.</li>
+                <li>Piso y marcom trasero inoxidable.</li>
+                <li>Forro interior inoxidable.</li>
+                <li>Esquinerosm y vistas de aluminio antiderrapante.</li>
                 <li>Estructura de arriba fabricada con lam. Cal. 14.</li>
-                <li>Forro interior de triplay con refuerzos laterales.</li>
-                <li>Puertas abatibles de hoja de triplay.</li>
-                <li>Forro exterior con lámina blanco wash (el acabado puede ser a gusto del cliente ya sea liso o con remaches visibles).</li>
-                <li>Copete de 1.00 alto.</li>
+                <li>Puertas por fuera con antiderrapante galvanizado para mejor acabado.</li>
+                <li>Estribo forrado de aluminio.</li>
+                <li>Vistas de aluminio antiderrapante.</li>
             </ul>
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="ruta/a/copete1.jpg" alt="Caja Seca con Copete 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cajas-camioneta/copete1.jpg') }}" alt="Caja Seca con Copete 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
             <div class="custom-card-img">
-                <img src="ruta/a/copete2.jpg" alt="Caja Seca con Copete 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cajas-camioneta/copete2.jpg') }}" alt="Caja Seca con Copete 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
             <div class="custom-card-img">
-                <img src="ruta/a/copete3.jpg" alt="Caja Seca con Copete 3" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/cajas-camioneta/copete3.jpg') }}" alt="Caja Seca con Copete 3" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>

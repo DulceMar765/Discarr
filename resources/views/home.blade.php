@@ -154,6 +154,22 @@
           pointer-events: auto;
         }
 
+        .gradient-title-overlay {
+          pointer-events: none;
+          height: 110px;
+          border-radius: 0 0 0.5rem 0.5rem;
+          background: linear-gradient(
+            to top,
+            rgba(0,0,0,0.85) 70%,
+            rgba(0,0,0,0.0) 100%
+          );
+          z-index: 1;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+        }
+
     </style>
 
     <div class="hero-content">
@@ -248,10 +264,15 @@
           <div class="row g-4 justify-content-center">
             <div class="col-md-3">
               <a href="{{ route('servicios.cajas-camioneta') }}" style="text-decoration:none;">
-                <div class="card service-card text-white border-0 shadow-lg h-100"
-                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Cajas para Camioneta y Camión</div>
+                <div class="card service-card text-white border-0 shadow-lg h-100 position-relative" style="cursor:pointer;">
+                  <div class="card-body d-flex flex-column align-items-center justify-content-end p-0 position-relative" style="height: 500px; overflow: hidden;">
+                    <img src="{{ asset('img/cajas-camioneta.jpg') }}" alt="Cajas para Camioneta y Camión"
+                         class="img-fluid w-100 h-100 position-absolute top-0 start-0" style="object-fit:cover; height:500px; z-index:0;">
+                    <div class="gradient-title-overlay">
+                      <div class="w-100 py-4 text-center fw-bold text-white fs-5" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                        Cajas para Camioneta y Camión
+                      </div>
+                    </div>
                   </div>
                   <div class="service-overlay">
                     <h3>Cajas para Camioneta y Camión</h3>
@@ -270,10 +291,15 @@
             </div>
             <div class="col-md-3">
               <a href="{{ route('servicios.maquilado-metales') }}" style="text-decoration:none;">
-                <div class="card service-card text-white border-0 shadow-lg h-100"
-                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Maquilado de Metales</div>
+                <div class="card service-card text-white border-0 shadow-lg h-100 position-relative" style="cursor:pointer;">
+                  <div class="card-body d-flex flex-column align-items-center justify-content-end p-0 position-relative" style="height: 500px; overflow: hidden;">
+                    <img src="{{ asset('img/maquilado-metales.jpg') }}" alt="Maquilado de Metales"
+                         class="img-fluid w-100 h-100 position-absolute top-0 start-0" style="object-fit:cover; height:500px; z-index:0;">
+                    <div class="gradient-title-overlay">
+                      <div class="w-100 py-4 text-center fw-bold text-white fs-5" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                        Maquilado de Metales
+                      </div>
+                    </div>
                   </div>
                   <div class="service-overlay">
                     <h3>Maquilado de Metales</h3>
@@ -289,10 +315,15 @@
             </div>
             <div class="col-md-3">
               <a href="{{ route('servicios.remolques') }}" style="text-decoration:none;">
-                <div class="card service-card text-white border-0 shadow-lg h-100"
-                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Remolques</div>
+                <div class="card service-card text-white border-0 shadow-lg h-100 position-relative" style="cursor:pointer;">
+                  <div class="card-body d-flex flex-column align-items-center justify-content-end p-0 position-relative" style="height: 500px; overflow: hidden;">
+                    <img src="{{ asset('img/remolques.jpg') }}" alt="Remolques"
+                         class="img-fluid w-100 h-100 position-absolute top-0 start-0" style="object-fit:cover; height:500px; z-index:0;">
+                    <div class="gradient-title-overlay">
+                      <div class="w-100 py-4 text-center fw-bold text-white fs-5" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                        Remolques
+                      </div>
+                    </div>
                   </div>
                   <div class="service-overlay">
                     <h3>Remolques</h3>
@@ -318,11 +349,15 @@
         <div class="carousel-item">
           <div class="row g-4 justify-content-center">
             <div class="col-md-3">
-              <!-- Sin <a> porque ya no existe la ruta -->
-              <div class="card service-card text-white border-0 shadow-lg h-100"
-                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Corte Plasma CNC</div>
+              <div class="card service-card text-white border-0 shadow-lg h-100 position-relative" style="cursor:pointer;">
+                <div class="card-body d-flex flex-column align-items-center justify-content-end p-0 position-relative" style="height: 500px; overflow: hidden;">
+                  <img src="{{ asset('img/corte-plasma.jpg') }}" alt="Corte Plasma CNC"
+                       class="img-fluid w-100 h-100 position-absolute top-0 start-0" style="object-fit:cover; height:500px; z-index:0;">
+                  <div class="gradient-title-overlay">
+                    <div class="w-100 py-4 text-center fw-bold text-white fs-5" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                      Corte Plasma CNC
+                    </div>
+                  </div>
                 </div>
                 <div class="service-overlay">
                   <h3>Corte Plasma CNC</h3>
@@ -336,11 +371,15 @@
               </div>
             </div>
             <div class="col-md-3">
-              <!-- Sin <a> porque ya no existe la ruta -->
-              <div class="card service-card text-white border-0 shadow-lg h-100"
-                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Herrería con Diseño</div>
+              <div class="card service-card text-white border-0 shadow-lg h-100 position-relative" style="cursor:pointer;">
+                <div class="card-body d-flex flex-column align-items-center justify-content-end p-0 position-relative" style="height: 500px; overflow: hidden;">
+                  <img src="{{ asset('img/herreria-diseno.jpg') }}" alt="Herrería con Diseño"
+                       class="img-fluid w-100 h-100 position-absolute top-0 start-0" style="object-fit:cover; height:500px; z-index:0;">
+                  <div class="gradient-title-overlay">
+                    <div class="w-100 py-4 text-center fw-bold text-white fs-5" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                      Herrería con Diseño
+                    </div>
+                  </div>
                 </div>
                 <div class="service-overlay">
                   <h3>Herrería con Diseño</h3>
@@ -355,11 +394,15 @@
               </div>
             </div>
             <div class="col-md-3">
-              <!-- Sin <a> porque ya no existe la ruta -->
-              <div class="card service-card text-white border-0 shadow-lg h-100"
-                   style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                  <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Estructuras</div>
+              <div class="card service-card text-white border-0 shadow-lg h-100 position-relative" style="cursor:pointer;">
+                <div class="card-body d-flex flex-column align-items-center justify-content-end p-0 position-relative" style="height: 500px; overflow: hidden;">
+                  <img src="{{ asset('img/estructuras.jpg') }}" alt="Estructuras"
+                       class="img-fluid w-100 h-100 position-absolute top-0 start-0" style="object-fit:cover; height:500px; z-index:0;">
+                  <div class="gradient-title-overlay">
+                    <div class="w-100 py-4 text-center fw-bold text-white fs-5" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                      Estructuras
+                    </div>
+                  </div>
                 </div>
                 <div class="service-overlay">
                   <h3>Estructuras</h3>
@@ -380,10 +423,15 @@
           <div class="row g-4 justify-content-center">
             <div class="col-md-3">
               <a href="{{ route('servicios.semirremolques') }}" style="text-decoration:none;">
-                <div class="card service-card text-white border-0 shadow-lg h-100"
-                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Semirremolques</div>
+                <div class="card service-card text-white border-0 shadow-lg h-100 position-relative" style="cursor:pointer;">
+                  <div class="card-body d-flex flex-column align-items-center justify-content-end p-0 position-relative" style="height: 500px; overflow: hidden;">
+                    <img src="{{ asset('img/semirremolques.jpg') }}" alt="Semirremolques"
+                         class="img-fluid w-100 h-100 position-absolute top-0 start-0" style="object-fit:cover; height:500px; z-index:0;">
+                    <div class="gradient-title-overlay">
+                      <div class="w-100 py-4 text-center fw-bold text-white fs-5" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                        Semirremolques
+                      </div>
+                    </div>
                   </div>
                   <div class="service-overlay">
                     <h3>Semirremolques</h3>
@@ -401,10 +449,15 @@
             </div>
             <div class="col-md-3">
               <a href="{{ route('servicios.renta-oficinas-moviles') }}" style="text-decoration:none;">
-                <div class="card service-card text-white border-0 shadow-lg h-100"
-                     style="background-color: rgba(0, 0, 0, 0.6); cursor:pointer;">
-                  <div class="card-body d-flex align-items-end p-0" style="height: 500px;">
-                    <div class="w-100 py-4 text-center fw-bold text-white rounded-bottom">Renta de Oficinas Móviles</div>
+                <div class="card service-card text-white border-0 shadow-lg h-100 position-relative" style="cursor:pointer;">
+                  <div class="card-body d-flex flex-column align-items-center justify-content-end p-0 position-relative" style="height: 500px; overflow: hidden;">
+                    <img src="{{ asset('img/oficinas-moviles.jpg') }}" alt="Renta de Oficinas Móviles"
+                         class="img-fluid w-100 h-100 position-absolute top-0 start-0" style="object-fit:cover; height:500px; z-index:0;">
+                    <div class="gradient-title-overlay">
+                      <div class="w-100 py-4 text-center fw-bold text-white fs-5" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                        Renta de Oficinas Móviles
+                      </div>
+                    </div>
                   </div>
                   <div class="service-overlay">
                     <h3>Renta de Oficinas Móviles</h3>
