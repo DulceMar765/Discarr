@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Material;
 use App\Models\MaterialProject;
+use App\Models\Category;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class MaterialController extends Controller
@@ -18,7 +20,9 @@ class MaterialController extends Controller
     // Formulario de alta de material
     public function create()
     {
-        return view('admin.material.create');
+        $categories = Category::all();
+        $suppliers = Supplier::all();
+        return view('admin.material.create', compact('categories', 'suppliers'));
     }
 
     // Guardar material nuevo
@@ -27,18 +31,21 @@ class MaterialController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'quantity' => 'required|numeric|min:0',
+            'stock' => 'required|numeric|min:0',
             'unit' => 'required|string|max:50',
             'price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'supplier_id' => 'required|exists:suppliers,id',
         ]);
+
         Material::create($request->all());
+
         return redirect()->route('admin.material.index')->with('success', 'Material creado correctamente.');
     }
 
     // Mostrar detalle de material (incluye uso por proyecto)
     public function show(Material $material)
     {
-        // Consulta del uso por proyecto
         $usos = MaterialProject::where('material_id', $material->id)->with('project')->get();
         return view('admin.material.show', compact('material', 'usos'));
     }
@@ -46,7 +53,9 @@ class MaterialController extends Controller
     // Formulario de edición
     public function edit(Material $material)
     {
-        return view('admin.material.edit', compact('material'));
+        $categories = Category::all();
+        $suppliers = Supplier::all();
+        return view('admin.material.edit', compact('material', 'categories', 'suppliers'));
     }
 
     // Actualizar material
@@ -55,18 +64,22 @@ class MaterialController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'quantity' => 'required|numeric|min:0',
+            'stock' => 'required|numeric|min:0',
             'unit' => 'required|string|max:50',
             'price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'supplier_id' => 'required|exists:suppliers,id',
         ]);
+
         $material->update($request->all());
-        return redirect()->route('materials.index')->with('success', 'Material actualizado correctamente.');
+
+        return redirect()->route('admin.material.index')->with('success', 'Material actualizado correctamente.');
     }
 
     // Eliminar material
     public function destroy(Material $material)
     {
         $material->delete();
-        return redirect()->route('materials.index')->with('success', 'Material eliminado.');
+        return redirect()->route('admin.material.index')->with('success', 'Material eliminado correctamente.');
     }
 }
