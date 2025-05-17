@@ -158,7 +158,6 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/nosotros">Nosotros</a></li>
                     <li class="nav-item"><a class="nav-link" href="/appointments/create">Reservaciones</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contacto">Contacto</a></li>
                 </ul>
@@ -167,8 +166,6 @@
                         <!-- Opciones para administradores -->
                         <a href="{{ route('admin.dashboard') }}" class="btn btn-login ms-3">Panel Admin</a>
                     @endif
-                    <!-- Opciones para usuarios autenticados -->
-                    <a href="{{ route('profile.edit') }}" class="btn btn-register ms-3">Mi Perfil</a>
                     <!-- Botón de Cerrar Sesión -->
                     <form method="POST" action="{{ route('logout') }}" class="d-inline ms-3">
                         @csrf
@@ -193,7 +190,6 @@
         <div class="container text-center">
             <div class="footer-links mb-3">
                 <a href="/">Inicio</a> |
-                <a href="/nosotros">Nosotros</a> |
                 <a href="/contacto">Contacto</a>
             </div>
             <div class="social-links mb-3">

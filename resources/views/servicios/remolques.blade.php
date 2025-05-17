@@ -77,7 +77,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 4x8 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 1 tonelada.
             </div>
-            <img src="{{ asset('img/cama-baja.jpg') }}" alt="Remolque Cama Baja" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/cama-baja.jpg') }}" alt="Remolque Cama Baja" class="remolque-card-img no-border">
         </div>
         <!-- Tarjeta 2 -->
         <div class="remolque-card">
@@ -86,7 +86,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 5x10 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 1.5 y 3 toneladas.
             </div>
-            <img src="{{ asset('img/remolque-ganadero.jpg') }}" alt="Remolque Ganadero 1" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/remolque-ganadero.jpg') }}" alt="Remolque Ganadero 1" class="remolque-card-img no-border">
         </div>
         <!-- Tarjeta 3 -->
         <div class="remolque-card">
@@ -95,7 +95,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 6x16 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 3 y 6 toneladas.
             </div>
-            <img src="{{ asset('img/remolque-ganadero-2.jpg') }}" alt="Remolque Ganadero 2" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/remolque-ganadero-2.jpg') }}" alt="Remolque Ganadero 2" class="remolque-card-img no-border">
         </div>
         <!-- Tarjeta 4 -->
         <div class="remolque-card">
@@ -104,7 +104,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 4x8 y 5x10 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 800 kg y 1.5 toneladas.
             </div>
-            <img src="{{ asset('img/remolque-caja-seca.jpg') }}" alt="Remolque Caja Seca" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/remolque-caja-seca.jpg') }}" alt="Remolque Caja Seca" class="remolque-card-img no-border">
         </div>
     </div>
     <!-- Segunda fila de tarjetas -->
@@ -116,7 +116,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 7x10 y 7x20 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 3 y 6 toneladas.
             </div>
-            <img src="{{ asset('img/caja-seca-2.jpg') }}" alt="Remolque Caja Seca" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/caja-seca-2.jpg') }}" alt="Remolque Caja Seca" class="remolque-card-img no-border">
         </div>
         <!-- Tarjeta 6 -->
         <div class="remolque-card">
@@ -125,7 +125,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 5x10 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 1.5 toneladas.
             </div>
-            <img src="{{ asset('img/cama-baja2.png') }}" alt="Remolque Cama Baja" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/cama-baja2.png') }}" alt="Remolque Cama Baja" class="remolque-card-img no-border">
         </div>
         <!-- Tarjeta 7 -->
         <div class="remolque-card">
@@ -135,7 +135,7 @@
                 <strong style="color:#ff6600;">Altura:</strong> 9 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 4 y 6 toneladas.
             </div>
-            <img src="{{ asset('img/Remolque-agricola.jpg') }}" alt="Remolque Agrícola" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/Remolque-agricola.jpg') }}" alt="Remolque Agrícola" class="remolque-card-img no-border">
         </div>
         <!-- Tarjeta 8 -->
         <div class="remolque-card">
@@ -144,7 +144,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 4x8, 5x10 y 7x10 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 800 kg, 1.5 y 3 toneladas.
             </div>
-            <img src="{{ asset('img/remolque-puntoventa.jpg') }}" alt="Remolque Punto Venta" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/remolque-puntoventa.jpg') }}" alt="Remolque Punto Venta" class="remolque-card-img no-border">
         </div>
     </div>
     <!-- Tercera fila de tarjetas -->
@@ -156,7 +156,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 5x10, 7x10 y 7x20 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 1.5, 3 y 6 toneladas.
             </div>
-            <img src="{{ asset('img/remolque-cajavolteo.png') }}" alt="Remolque Cama Baja de Volteo" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/remolque-cajavolteo.png') }}" alt="Remolque Cama Baja de Volteo" class="remolque-card-img no-border">
         </div>
         <!-- Tarjeta 10 -->
         <div class="remolque-card">
@@ -165,7 +165,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 1.27x2.44 mts.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 800 kg
             </div>
-            <img src="{{ asset('img/remolque-caja-baja-todoterreno.jpeg') }}" alt="Remolque Todo Terreno" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/remolque-caja-baja-todoterreno.jpeg') }}" alt="Remolque Todo Terreno" class="remolque-card-img no-border">
         </div>
         <!-- Tarjeta 11 -->
         <div class="remolque-card">
@@ -174,7 +174,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 8x36 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 10 toneladas.
             </div>
-            <img src="{{ asset('img/remolque-caja-baja-ganso.jpg') }}" alt="Remolque Cuello de Ganso" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/remolque-caja-baja-ganso.jpg') }}" alt="Remolque Cuello de Ganso" class="remolque-card-img no-border">
         </div>
         <!-- Tarjeta 12 -->
         <div class="remolque-card">
@@ -183,7 +183,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 7x20 pies.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 3 y 6 toneladas.
             </div>
-            <img src="{{ asset('img/remolque-camabaja-redilas-abiertas.jpg') }}" alt="Remolque Redilas Abiertas" class="remolque-card-img no-border">
+            <img src="{{ asset('img/remolques/remolque-camabaja-redilas-abiertas.jpg') }}" alt="Remolque Redilas Abiertas" class="remolque-card-img no-border">
         </div>
     </div>
 </div>

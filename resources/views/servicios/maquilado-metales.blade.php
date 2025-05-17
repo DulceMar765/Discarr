@@ -43,8 +43,8 @@
         align-items: flex-start;
     }
     .custom-card-img {
-        width: 180px;
-        height: 120px;
+        width: 270px;
+        height: 270px;
         object-fit: cover;
         border-radius: 12px;
         border: 2px solid #ff6600;
@@ -66,8 +66,8 @@
         }
         .custom-card-img {
             margin: 0;
-            width: 100px;
-            height: 70px;
+            width: 150px;
+            height: 105px;
         }
     }
 </style>
@@ -92,10 +92,7 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="{{ asset('img/doblado-de-lamina.jpg') }}" alt="Doblado 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
-            </div>
-            <div class="custom-card-img">
-                <img src="{{ asset('img/doblado-lamina-negra.jpg') }}" alt="Doblado 2" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/maquilado-metales/doblado-de-lamina.jpg') }}" alt="Doblado 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>
@@ -122,7 +119,7 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="{{ asset('img/maquila-corte.jpg') }}" alt="Corte" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/maquilado-metales/maquila-corte.jpg') }}" alt="Corte" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>
@@ -148,7 +145,7 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="{{ asset('img/caja-redilas.jpeg') }}" alt="Caja de Redilas Estándar" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/maquilado-metales/caja-redilas.jpg') }}" alt="Caja de Redilas Estándar" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>
@@ -175,7 +172,7 @@
         </div>
         <div class="custom-images-col">
             <div class="custom-card-img">
-                <img src="{{ asset('img/cono-pieza.jpg') }}" alt="Cono o transición 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+                <img src="{{ asset('img/maquilado-metales/cono-pieza.jpg') }}" alt="Cono o transición 1" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
             </div>
         </div>
     </div>

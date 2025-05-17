@@ -77,7 +77,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 3x6 mts.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 4 personas.
             </div>
-            <img src="{{ asset('img/renta-de-oficinas-móviles.jpeg') }}" alt="Oficina Móvil Básica" class="oficina-card-img no-border">
+            <img src="{{ asset('img/renta-oficinas-moviles/renta-de-oficinas-móviles.jpeg') }}" alt="Oficina Móvil Básica" class="oficina-card-img no-border">
         </div>
         <!-- Tarjeta 2 -->
         <div class="oficina-card">
@@ -86,7 +86,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 3x8 mts.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 6 personas.
             </div>
-            <img src="{{ asset('img/oficina-movil-estandar.jpg') }}" alt="Oficina Móvil Estándar" class="oficina-card-img no-border">
+            <img src="{{ asset('img/renta-oficinas-moviles/oficina-movil-estandar.jpg') }}" alt="Oficina Móvil Estándar" class="oficina-card-img no-border">
         </div>
         <!-- Tarjeta 3 -->
         <div class="oficina-card">
@@ -95,7 +95,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 3x10 mts.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 8 personas.
             </div>
-            <img src="{{ asset('img/oficina-movil-premium.jpg') }}" alt="Oficina-movil-premium.jpg" class="oficina-card-img no-border">
+            <img src="{{ asset('img/renta-oficinas-moviles/oficina-movil-premium.jpg') }}" alt="Oficina-movil-premium.jpg" class="oficina-card-img no-border">
         </div>
         <!-- Tarjeta 4 -->
         <div class="oficina-card">
@@ -104,7 +104,7 @@
                 <strong style="color:#ff6600;">Medidas:</strong> 3x12 mts.<br>
                 <strong style="color:#ff6600;">Capacidad:</strong> 10 personas.
             </div>
-            <img src="{{ asset('img/oficinas-moviles-delujo.jpeg') }}" alt="Oficina Móvil de Lujo" class="oficina-card-img no-border">
+            <img src="{{ asset('img/renta-oficinas-moviles/oficinas-moviles-delujo.jpeg') }}" alt="Oficina Móvil de Lujo" class="oficina-card-img no-border">
         </div>
     </div>
 </div>
