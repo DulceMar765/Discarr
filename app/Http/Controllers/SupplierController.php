@@ -58,13 +58,15 @@ class SupplierController extends Controller
 
         return response()->json([
             'message' => 'Proveedor agregado exitosamente.',
-            'html' => $html
+            'html' => $html,
+            'redirect' => route('supplier.index') // <-- ESTA LÍNEA ES CLAVE
         ]);
     }
 
-    // Si no es AJAX, redirect normal
+    // Si no es AJAX, redireccionamiento normal
     return redirect()->route('supplier.index')->with('success', 'Proveedor agregado exitosamente.');
 }
+
 
 
     /**
@@ -89,24 +91,34 @@ class SupplierController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, Supplier $supplier)
-    {
-        // Valida los datos del formulario
-        $request->validate([
-            'name' => 'required|string|max:255|unique:suppliers,name,' . $supplier->id,
-            'contact_name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:suppliers,email,' . $supplier->id,
-            'phone_number' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:1000',
-            'website' => 'nullable|url|max:255',
-            'priority' => 'required|in:High,Medium,Low',
-            'reliability_score' => 'nullable|integer|min:0|max:100',
+{
+    // Valida los datos del formulario
+    $request->validate([
+        'name' => 'required|string|max:255|unique:suppliers,name,' . $supplier->id,
+        'contact_name' => 'nullable|string|max:255',
+        'email' => 'nullable|email|unique:suppliers,email,' . $supplier->id,
+        'phone_number' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:1000',
+        'website' => 'nullable|url|max:255',
+        'priority' => 'required|in:High,Medium,Low',
+        'reliability_score' => 'nullable|integer|min:0|max:100',
+    ]);
+
+    // Actualiza el proveedor
+    $supplier->update($request->all());
+
+    // Si es una petición AJAX, devuelve redirección como JSON
+    if ($request->ajax()) {
+        return response()->json([
+            'message' => 'Proveedor actualizado exitosamente.',
+            'redirect' => route('supplier.index')
         ]);
-
-        // Actualiza el proveedor
-        $supplier->update($request->all());
-
-        return redirect()->route('supplier.index')->with('success', 'Proveedor actualizado exitosamente.');
     }
+
+    // Si no es AJAX, redirección normal
+    return redirect()->route('supplier.index')->with('success', 'Proveedor actualizado exitosamente.');
+}
+
 
     /**
      * Remove the specified resource from storage.

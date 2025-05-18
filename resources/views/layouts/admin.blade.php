@@ -141,12 +141,11 @@
 
     <!-- Main Content -->
     <div class="main-content" id="admin-content">
-        @hasSection('content')
-            @yield('content') <!-- Renderiza contenido estático -->
-        @else
-            @yield('main-content') <!-- Renderiza contenido dinámico -->
-        @endif
-    </div>
+    @if (!request()->ajax())
+        @yield('content')
+    @endif
+</div>
+
 
     <!-- Bootstrap y JQuery -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

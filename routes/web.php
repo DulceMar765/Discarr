@@ -240,6 +240,7 @@ Route::prefix('admin/supplier')->name('supplier.')->group(function() {
 // Recurso completo con rutas RESTful
 Route::resource('vacations', VacationController::class);
 
+
 // Servicios adicionales
 Route::get('/servicios/cajas-camioneta', function () {
     return view('servicios.cajas-camioneta');

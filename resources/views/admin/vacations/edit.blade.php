@@ -1,68 +1,109 @@
-<div class="admin-section">
-    <h2 class="mb-4"><i class="bi bi-pencil-square me-2"></i> Editar Vacación</h2>
+<div class="container">
+    <h1>Editar Vacación</h1>
 
-    <form id="vacation-edit-form">
+    <form id="vacation-edit-form" action="{{ route('vacations.update', $vacation->id) }}" method="POST">
         @csrf
         @method('PUT')
 
-        <div class="mb-3">
-            <label for="employee_id" class="form-label">Empleado</label>
-            <select name="employee_id" class="form-select" required>
-                @foreach ($employees as $employee)
-                    <option value="{{ $employee->id }}" {{ $vacation->employee_id == $employee->id ? 'selected' : '' }}>
+        <!-- Empleado -->
+        <div class="form-group">
+            <label for="employee_id">Empleado</label>
+            <select name="employee_id" id="employee_id" class="form-control" required>
+                <option value="">Seleccione un empleado</option>
+                @foreach($employees as $employee)
+                    <option value="{{ $employee->id }}" {{ old('employee_id', $vacation->employee_id) == $employee->id ? 'selected' : '' }}>
                         {{ $employee->name }}
                     </option>
                 @endforeach
             </select>
+            <div id="error-employee_id" class="text-danger"></div>
         </div>
 
-        <div class="mb-3">
-            <label for="start_date" class="form-label">Fecha de inicio</label>
-            <input type="date" name="start_date" class="form-control" value="{{ $vacation->start_date->format('Y-m-d') }}" required>
+        <!-- Fecha de Inicio -->
+        <div class="form-group">
+            <label for="start_date">Fecha de Inicio</label>
+            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ old('start_date', $vacation->start_date) }}" required>
+            <div id="error-start_date" class="text-danger"></div>
         </div>
 
-        <div class="mb-3">
-            <label for="end_date" class="form-label">Fecha de fin</label>
-            <input type="date" name="end_date" class="form-control" value="{{ $vacation->end_date->format('Y-m-d') }}" required>
+        <!-- Fecha de Fin -->
+        <div class="form-group">
+            <label for="end_date">Fecha de Fin</label>
+            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ old('end_date', $vacation->end_date) }}" required>
+            <div id="error-end_date" class="text-danger"></div>
         </div>
 
-        <div class="mb-3">
-            <label for="reason" class="form-label">Motivo</label>
-            <textarea name="reason" class="form-control" rows="3">{{ $vacation->reason }}</textarea>
+        <!-- Motivo -->
+        <div class="form-group">
+            <label for="reason">Motivo</label>
+            <input type="text" name="reason" id="reason" class="form-control" value="{{ old('reason', $vacation->reason) }}">
+            <div id="error-reason" class="text-danger"></div>
         </div>
 
-        <button type="submit" class="btn btn-success">Actualizar</button>
-        <a href="#" onclick="loadAdminSection('{{ route('vacations.index') }}'); return false;" class="btn btn-secondary">Cancelar</a>
+        <!-- Estado -->
+        <div class="form-group">
+            <label for="status">Estado</label>
+            <select name="status" id="status" class="form-control">
+            <option value="pendiente" {{ old('status', $vacation->status) == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+            <option value="aprobado" {{ old('status', $vacation->status) == 'aprobado' ? 'selected' : '' }}>Aprobado</option>
+            <option value="rechazado" {{ old('status', $vacation->status) == 'rechazado' ? 'selected' : '' }}>Rechazado</option>
+            </select>
+
+            <div id="error-status" class="text-danger"></div>
+        </div>
+
+        <!-- Botones -->
+        <button type="submit" class="btn btn-primary mt-3">Actualizar</button>
+        <a href="#" onclick="loadAdminSection('{{ route('vacations.index') }}'); return false;" class="btn btn-secondary mt-3">Cancelar</a>
     </form>
 </div>
 
 <script>
-document.getElementById('vacation-edit-form').addEventListener('submit', function(e) {
+document.getElementById('vacation-edit-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
     const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
     const formData = new FormData(form);
+    formData.append('_method', 'PUT');
 
-    fetch('{{ route('vacations.update', $vacation) }}', {
+    // Limpiar errores anteriores
+    document.querySelectorAll('[id^="error-"]').forEach(el => el.textContent = '');
+
+    submitBtn.disabled = true;
+
+    fetch(form.action, {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content,
+            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+            'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
         },
-        body: formData
+        body: formData,
     })
     .then(async response => {
-        if (response.ok) {
+        submitBtn.disabled = false;
+        if (response.status === 422) {
             const data = await response.json();
-            loadAdminSection(data.redirect); // Recarga listado de vacaciones
+            for (const field in data.errors) {
+                const errorElement = document.getElementById('error-' + field);
+                if (errorElement) {
+                    errorElement.textContent = data.errors[field][0];
+                }
+            }
+        } else if (response.ok) {
+            const data = await response.json();
+            if (data.redirect) {
+                loadAdminSection(data.redirect);
+            }
         } else {
-            const errorText = await response.text();
-            document.querySelector('.admin-section').innerHTML = errorText;
+            alert('Ocurrió un error inesperado.');
         }
     })
     .catch(error => {
+        submitBtn.disabled = false;
         console.error('Error:', error);
-        alert('Fallo al actualizar la solicitud.');
+        alert('Fallo la conexión al servidor.');
     });
 });
 </script>

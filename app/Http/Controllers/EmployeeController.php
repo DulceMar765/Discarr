@@ -16,15 +16,19 @@ class EmployeeController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $employees = Employee::all();
+{
+    $employees = Employee::all()->map(function ($employee) {
+        $employee->on_vacation = $employee->isOnVacation(); // Aquí añadimos el atributo dinámico
+        return $employee;
+    });
 
-        if (request()->ajax()) {
-            return view('admin.employee.index', compact('employees'))->render();
-        }
-
-        return view('admin.employee.index', compact('employees')); // Vista de empleados
+    if (request()->ajax()) {
+        return view('admin.employee.index', compact('employees'))->render();
     }
+
+    return view('admin.employee.index', compact('employees'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -83,12 +87,8 @@ class EmployeeController extends Controller
     public function edit(Employee $employee)
     {
         $this->authorize('update', $employee); // Verifica si el usuario puede editar este empleado
-
-        if (request()->ajax()) {
-            return view('admin.employee.edit', compact('employee'))->render();
-        }
-
-        return view('admin.dashboard'); // O tu vista principal por defecto
+        return view('admin.employee.edit', compact('employee'));
+        
     }
 
     /**

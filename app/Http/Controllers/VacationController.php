@@ -32,73 +32,80 @@ class VacationController extends Controller
     /**
      * Store a newly created vacation in storage.
      */
-    public function store(StoreVacationRequest $request)
+ public function store(Request $request)
 {
     try {
-        // Agrega esta línea para ver los datos antes de crear la vacación
-        dd($request->validated()); 
+        $validated = $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'reason' => 'nullable|string|max:255',
+            'status' => 'required|in:pendiente,aprobado,rechazado',
+        ]);
 
-        // Crear la vacación usando los datos validados
-        Vacation::create($request->validated());
+        $vacation = Vacation::create($validated);
 
-        // Responder si es AJAX
-        if ($request->ajax()) {
-            return response()->json([
-                'redirect' => route('vacations.index')
-            ]);
+        if ($vacation->status === 'aprobado') {
+            $employee = Employee::find($vacation->employee_id);
+            if ($employee) {
+                $employee->on_vacation = true;
+                $employee->save();
+            }
         }
 
-        return redirect()->route('vacations.index')
-            ->with('success', 'Vacación registrada exitosamente.');
+        return response()->json([
+            'message' => 'Vacación registrada exitosamente.',
+            'redirect' => route('vacations.index'),
+            'employee_on_vacation' => $vacation->status === 'aprobado',
+        ]);
     } catch (\Exception $e) {
-        // Captura cualquier excepción y muestra el mensaje
-        dd($e->getMessage()); // Esto te ayudará a ver el error exacto
+        return response()->json([
+            'error' => $e->getMessage(),
+        ], 500);
     }
 }
+
 
 
     /**
      * Show the form for editing the specified vacation.
      */
-    public function edit(Vacation $vacation)
-    {
-        $employees = Employee::all();
+   public function edit(Vacation $vacation)
+{
+     $employees = Employee::all();
 
-        if (request()->ajax()) {
-            return view('admin.vacations.edit', compact('vacation', 'employees'))->render();
-        }
+    return view('admin.vacations.edit', compact('vacation', 'employees'));
+}
 
-        return view('admin.dashboard');
-    }
 
     /**
      * Update the specified vacation in storage.
      */
-    public function update(UpdateVacationRequest $request, Vacation $vacation)
-    {
-        try {
-            // Actualizar la vacación usando los datos validados
-            $vacation->update($request->validated());
 
-            // Si es una petición AJAX, devolver una respuesta JSON
-            if ($request->ajax()) {
-                return response()->json([
-                    'redirect' => route('vacations.index')
-                ]);
-            }
+public function update(Request $request, Vacation $vacation)
+{
+    $validated = $request->validate([
+        'employee_id' => 'required|exists:employees,id',
+        'start_date' => 'required|date',
+        'end_date' => 'required|date|after_or_equal:start_date',
+        'reason' => 'nullable|string',
+        'status' => 'required|in:pendiente,aprobado,rechazado',
 
-            // Si no es AJAX, redirigir de manera tradicional
-            return redirect()->route('vacations.index')
-                ->with('success', 'Vacación actualizada exitosamente.');
-        } catch (\Exception $e) {
-            // Si ocurre un error, devolver una respuesta de error
-            if ($request->ajax()) {
-                return response()->json(['error' => 'Hubo un error al actualizar la vacación.'], 500);
-            }
 
-            return back()->with('error', 'Hubo un error al actualizar la vacación.');
-        }
+    ]);
+
+    $vacation->update($validated);
+
+    if ($request->ajax()) {
+        return response()->json([
+            'message' => 'Vacación actualizada correctamente.',
+            'redirect' => route('vacations.index'),
+        ]);
     }
+
+    return redirect()->route('vacations.index')->with('success', 'Vacación actualizada correctamente.');
+}
+
 
     /**
      * Remove the specified vacation from storage.

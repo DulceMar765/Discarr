@@ -27,21 +27,29 @@ class MaterialController extends Controller
 
     // Guardar material nuevo
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'stock' => 'required|numeric|min:0',
-            'unit' => 'required|string|max:50',
-            'price' => 'required|numeric|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'supplier_id' => 'required|exists:suppliers,id',
-        ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'stock' => 'required|numeric|min:0',
+        'unit' => 'required|string|max:50',
+        'price' => 'required|numeric|min:0',
+        'category_id' => 'required|exists:categories,id',
+        'supplier_id' => 'required|exists:suppliers,id',
+    ]);
 
-        Material::create($request->all());
+    $material = Material::create($validated);
 
-        return redirect()->route('admin.material.index')->with('success', 'Material creado correctamente.');
-    }
+    // Opcional: Puedes devolver un HTML actualizado para la lista o sólo un mensaje
+    // Por ejemplo, si tienes un partial blade para la lista de materiales:
+    // $html = view('admin.material.partials.list', ['materials' => Material::all()])->render();
+
+    return response()->json([
+        'message' => 'Material creado correctamente.',
+        // 'html' => $html,
+    ]);
+}
+
 
     // Mostrar detalle de material (incluye uso por proyecto)
     public function show(Material $material)
@@ -59,27 +67,45 @@ class MaterialController extends Controller
     }
 
     // Actualizar material
-    public function update(Request $request, Material $material)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'stock' => 'required|numeric|min:0',
-            'unit' => 'required|string|max:50',
-            'price' => 'required|numeric|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'supplier_id' => 'required|exists:suppliers,id',
+public function update(Request $request, Material $material)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'stock' => 'required|numeric|min:0',
+        'unit' => 'required|string|max:50',
+        'price' => 'required|numeric|min:0',
+        'category_id' => 'required|exists:categories,id',
+        'supplier_id' => 'required|exists:suppliers,id',
+    ]);
+
+    $material->update($request->all());
+
+    if ($request->ajax()) {
+        return response()->json([
+            'message' => 'Material actualizado correctamente.',
+            'redirect' => route('admin.material.index')  // ← muy importante que esté bien nombrada
         ]);
-
-        $material->update($request->all());
-
-        return redirect()->route('admin.material.index')->with('success', 'Material actualizado correctamente.');
     }
+
+    return redirect()->route('admin.material.index')->with('success', 'Material actualizado correctamente.');
+}
+
 
     // Eliminar material
-    public function destroy(Material $material)
-    {
-        $material->delete();
-        return redirect()->route('admin.material.index')->with('success', 'Material eliminado correctamente.');
+  public function destroy(Request $request, $id)
+{
+    $material = Material::findOrFail($id);
+    $material->delete();
+
+    if ($request->ajax()) {
+        return response()->json(['success' => true, 'message' => 'Material eliminado correctamente.']);
     }
+
+    return redirect()->route('admin.material.index')->with('success', 'Material eliminado correctamente.');
+}
+
+
+
+
 }

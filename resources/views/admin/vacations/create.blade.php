@@ -32,6 +32,15 @@
             <textarea name="reason" class="form-control" rows="3"></textarea>
         </div>
 
+        <div class="mb-3">
+            <label for="status" class="form-label text-dark">Estado</label>
+            <select name="status" class="form-select" required>
+                <option value="pendiente">Pendiente</option>
+                <option value="aprobado">Aprobado</option>
+                <option value="rechazado">Rechazado</option>
+            </select>
+        </div>
+
         <button type="submit" class="btn btn-success">Guardar</button>
         <a href="#" onclick="loadAdminSection('{{ route('vacations.index') }}'); return false;" class="btn btn-secondary">Cancelar</a>
     </form>

@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Material extends Model
 {
-    protected $fillable = [
+   protected $fillable = [
         'name',
         'description',
-        'stock',
+        'stock',   // <-- Aquí debe estar
         'unit',
         'price',
         'category_id',

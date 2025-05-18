@@ -13,6 +13,7 @@
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Email</th>
+                        <th>Estado</th> <!-- Nueva columna -->
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -22,6 +23,13 @@
                         <td>{{ $employee->id }}</td>
                         <td>{{ $employee->name }}</td>
                         <td>{{ $employee->email }}</td>
+                        <td>
+                            @if($employee->on_vacation)
+                                <span class="badge bg-warning text-dark">De vacaciones</span>
+                            @else
+                                <span class="badge bg-success">Disponible</span>
+                            @endif
+                        </td>
                         <td>
                             <a href="#" onclick="loadAdminSection('{{ route('employee.edit', $employee->id) }}'); return false;" class="btn btn-warning btn-sm">Editar</a>
                             <button onclick="deleteEmployee({{ $employee->id }});" class="btn btn-danger btn-sm">Eliminar</button>

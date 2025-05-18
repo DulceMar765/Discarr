@@ -1,6 +1,3 @@
-@extends('layouts.admin')
-
-@section('main-content')
 <div class="container">
     <h1>Editar Empleado</h1>
 
@@ -75,13 +72,17 @@ document.getElementById('employee-edit-form').addEventListener('submit', functio
     e.preventDefault();
 
     const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
     const formData = new FormData(form);
 
     // Limpiar errores anteriores
     document.querySelectorAll('[id^="error-"]').forEach(el => el.textContent = '');
 
+    // Deshabilitar botón para evitar envíos múltiples
+    submitBtn.disabled = true;
+
     fetch(form.action, {
-        method: 'POST', // Laravel usa POST + _method para PUT
+        method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
             'Accept': 'application/json',
@@ -90,11 +91,15 @@ document.getElementById('employee-edit-form').addEventListener('submit', functio
         body: formData,
     })
     .then(async response => {
+        submitBtn.disabled = false;
         if (response.status === 422) {
             const data = await response.json();
             const errors = data.errors;
             for (const field in errors) {
-                document.getElementById('error-' + field).textContent = errors[field][0];
+                const errorElement = document.getElementById('error-' + field);
+                if (errorElement) {
+                    errorElement.textContent = errors[field][0];
+                }
             }
         } else if (response.ok) {
             const data = await response.json();
@@ -106,9 +111,9 @@ document.getElementById('employee-edit-form').addEventListener('submit', functio
         }
     })
     .catch(error => {
+        submitBtn.disabled = false;
         console.error('Error:', error);
         alert('Fallo la conexión al servidor.');
     });
 });
 </script>
-@endsection
