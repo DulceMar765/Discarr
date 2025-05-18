@@ -31,8 +31,7 @@ class VacationController extends Controller
 
     /**
      * Store a newly created vacation in storage.
-     */
- public function store(Request $request)
+     */public function store(Request $request)
 {
     try {
         $validated = $request->validate([
@@ -45,10 +44,17 @@ class VacationController extends Controller
 
         $vacation = Vacation::create($validated);
 
+        // 👇 Aquí se actualiza el estado real del empleado
         if ($vacation->status === 'aprobado') {
             $employee = Employee::find($vacation->employee_id);
             if ($employee) {
-                $employee->on_vacation = true;
+                $isCurrentlyOnVacation = Vacation::where('employee_id', $employee->id)
+                    ->where('status', 'aprobado')
+                    ->whereDate('start_date', '<=', now())
+                    ->whereDate('end_date', '>=', now())
+                    ->exists();
+
+                $employee->on_vacation = $isCurrentlyOnVacation;
                 $employee->save();
             }
         }
@@ -64,6 +70,7 @@ class VacationController extends Controller
         ], 500);
     }
 }
+
 
 
 
