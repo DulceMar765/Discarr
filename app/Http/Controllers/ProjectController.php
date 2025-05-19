@@ -228,4 +228,48 @@ class ProjectController extends Controller
     ));
 }
 
+    /**
+     * Eliminar un proyecto y todos sus datos relacionados
+     *
+     * @param  \App\Models\Project  $project
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Project $project)
+    {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+        
+        // Verificar si el usuario es administrador
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+
+        try {
+            // Iniciar una transacción para asegurar la integridad de los datos
+            DB::beginTransaction();
+            
+            // Eliminar registros relacionados en la tabla project_employees
+            ProjectEmployee::where('project_id', $project->id)->delete();
+            
+            // Eliminar registros relacionados en la tabla material_projects
+            MaterialProject::where('project_id', $project->id)->delete();
+            
+            // Eliminar el proyecto
+            $project->delete();
+            
+            // Confirmar la transacción
+            DB::commit();
+            
+            return redirect()->route('admin.projects.index')
+                ->with('success', 'Proyecto eliminado correctamente.');
+        } catch (\Exception $e) {
+            // Revertir la transacción en caso de error
+            DB::rollBack();
+            
+            return redirect()->route('admin.projects.index')
+                ->with('error', 'Error al eliminar el proyecto: ' . $e->getMessage());
+        }
+    }
 }

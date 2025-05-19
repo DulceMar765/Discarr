@@ -265,6 +265,25 @@ Route::get('/servicios/renta-oficinas-moviles', function () {
 // Rutas de autenticación de Laravel
 require __DIR__.'/auth.php';
 
+// Rutas para proyectos - Mantener la compatibilidad con las rutas existentes
+Route::middleware(['auth'])->group(function () {
+    // Rutas principales de proyectos
+    Route::get('/admin/projects', [ProjectController::class, 'index'])->name('admin.projects.index');
+    Route::get('/admin/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/admin/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('/admin/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::get('/admin/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+    Route::put('/admin/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('/admin/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    
+    // Rutas para los códigos QR de proyectos
+    Route::get('/projects/{project}/qr', [ProjectQRController::class, 'generateQR'])->name('projects.qr');
+    Route::get('/projects/{project}/qr/download', [ProjectQRController::class, 'downloadQR'])->name('projects.qr.download');
+});
+
+// Ruta pública para ver el estado del proyecto
+Route::get('/project/status/{token}', [ProjectQRController::class, 'showProjectStatus'])->name('project.status');
+
 // Clientes autenticados pueden crear y guardar citas
 Route::middleware(['auth'])->group(function () {
     Route::get('/appointments/create', [AppointmentsController::class, 'create'])->name('appointments.create');
