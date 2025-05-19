@@ -533,3 +533,156 @@
         justify-content: center;
     }
 </style>
+
+<script>
+// Función para cambiar el estado de una cita
+function changeStatus(appointmentId, status) {
+    // Mostrar confirmación
+    const statusText = status === 'confirmed' ? 'confirmar' : (status === 'cancelled' ? 'cancelar' : 'cambiar el estado de');
+    
+    if (!confirm(`¿Estás seguro que deseas ${statusText} esta reservación?`)) {
+        return; // Salir si el usuario cancela
+    }
+    
+    // Obtener token CSRF de la meta tag
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+    
+    // Buscar la fila de la cita
+    const originalRow = $('#appointmentsTable tbody tr').filter(function() {
+        return $(this).find('td:first-child').text().trim() == appointmentId;
+    }).first();
+    
+    let actionCell = originalRow.find('td:last-child');
+    let originalContent = actionCell.html();
+    
+    // Mostrar indicador de carga
+    if (actionCell.length) {
+        actionCell.html('<div class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"></div></div>');
+    }
+    
+    // Realizar la petición AJAX para actualizar el estado
+    $.ajax({
+        url: `/admin/appointments/${appointmentId}/status`,
+        type: 'POST',
+        data: { status: status, _token: csrfToken },
+        dataType: 'json',
+        success: function(data) {
+            if (data.success) {
+                // Mostrar notificación de éxito
+                alert('Estado actualizado correctamente');
+                
+                // Recargar la sección para ver los cambios
+                loadAdminSection('/admin/appointments');
+            } else {
+                // Mostrar error
+                alert('Error: ' + (data.message || 'No se pudo actualizar el estado'));
+                
+                // Restaurar el contenido original de la celda de acciones
+                if (actionCell.length) {
+                    actionCell.html(originalContent);
+                }
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('Error al procesar la solicitud: ' + (xhr.responseJSON?.message || 'Por favor, intenta de nuevo.'));
+            
+            // Restaurar el contenido original de la celda de acciones
+            if (actionCell.length) {
+                actionCell.html(originalContent);
+            }
+        }
+    });
+}
+
+// Función para eliminar una cita
+function deleteAppointment(appointmentId) {
+    // Mostrar confirmación
+    if (!confirm('¿Estás seguro que deseas eliminar esta reservación? Esta acción no se puede deshacer.')) {
+        return; // Salir si el usuario cancela
+    }
+    
+    // Obtener token CSRF de la meta tag
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+    
+    // Buscar la fila de la cita
+    const originalRow = $('#appointmentsTable tbody tr').filter(function() {
+        return $(this).find('td:first-child').text().trim() == appointmentId;
+    }).first();
+    
+    let actionCell = originalRow.find('td:last-child');
+    let originalContent = actionCell.html();
+    
+    // Mostrar indicador de carga
+    if (originalRow.length) {
+        originalRow.addClass('table-danger');
+        if (actionCell.length) {
+            actionCell.html('<div class="text-center"><div class="spinner-border spinner-border-sm text-danger" role="status"></div></div>');
+        }
+    }
+    
+    // Realizar la petición AJAX para eliminar la cita
+    $.ajax({
+        url: `/admin/appointments/${appointmentId}`,
+        type: 'POST',
+        data: { _method: 'DELETE', _token: csrfToken },
+        dataType: 'json',
+        success: function(data) {
+            if (data.success) {
+                // Mostrar notificación de éxito
+                alert('Reservación eliminada correctamente');
+                
+                // Animar y eliminar la fila de la tabla
+                if (originalRow.length) {
+                    originalRow.css('transition', 'opacity 0.5s').css('opacity', '0');
+                    setTimeout(function() {
+                        originalRow.remove();
+                        
+                        // Actualizar contador
+                        const totalElement = $('#totalAppointments');
+                        if (totalElement.length) {
+                            let currentTotal = parseInt(totalElement.text(), 10);
+                            totalElement.text(Math.max(0, currentTotal - 1));
+                        }
+                        
+                        const visibleElement = $('#visibleAppointments');
+                        if (visibleElement.length) {
+                            let currentVisible = parseInt(visibleElement.text(), 10);
+                            visibleElement.text(Math.max(0, currentVisible - 1));
+                        }
+                        
+                        // Actualizar el filtrado si es necesario
+                        updateVisibleCount();
+                    }, 500);
+                } else {
+                    // Si no podemos encontrar la fila, recargar toda la sección
+                    loadAdminSection('/admin/appointments');
+                }
+            } else {
+                // Mostrar error
+                alert('Error: ' + (data.message || 'No se pudo eliminar la reservación'));
+                
+                // Restaurar el contenido original
+                if (originalRow.length) {
+                    originalRow.removeClass('table-danger');
+                    if (actionCell.length) {
+                        actionCell.html(originalContent);
+                    }
+                }
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('Error al procesar la solicitud: ' + (xhr.responseJSON?.message || 'Por favor, intenta de nuevo.'));
+            
+            // Restaurar el contenido original
+            if (originalRow.length) {
+                originalRow.removeClass('table-danger');
+                if (actionCell.length) {
+                    actionCell.html(originalContent);
+                }
+            }
+        }
+    });
+}
+</script>

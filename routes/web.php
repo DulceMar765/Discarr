@@ -151,7 +151,7 @@ Route::prefix('admin/appointments')->name('admin.appointments.')->group(function
     Route::get('/day-config/{date}', [AppointmentsController::class, 'getDayConfig'])->name('day-config');
     Route::post('/save-availability', [AppointmentsController::class, 'saveAvailability'])->name('save-availability');
     Route::get('/available-slots', [AppointmentsController::class, 'getAvailableSlots'])->name('available-slots');
-    Route::patch('/{appointment}/status', [AppointmentsController::class, 'updateStatus'])->name('update-status');
+    Route::post('/{appointment}/status', [AppointmentsController::class, 'updateStatus'])->name('update-status');
 });
 
 // Rutas completas para la sección de clientes
