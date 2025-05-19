@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-use Carbon\Carbon;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,23 +25,4 @@ class Employee extends Model
         'salary' => 'decimal:2',
         'status' => 'boolean'
     ];
-
-    public function vacations()
-   {
-    return $this->hasMany(Vacation::class);
-   }
-
-    // Método para saber si el empleado está de vacaciones
-    public function isOnVacation($date = null)
-    {
-        $date = $date ?: Carbon::today();
-
-        return $this->vacations()
-            ->where('status', 'aprobado')
-            ->where('start_date', '<=', $date)
-            ->where('end_date', '>=', $date)
-            ->exists();
-    }
-
 }
-
