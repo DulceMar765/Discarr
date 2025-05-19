@@ -19,7 +19,7 @@ class Employee extends Model
         'hire_date',
         'address',
         'status',
-        'on_vacation', // ✅ agregado
+        'on_vacation', 
     ];
 
     protected $casts = [
