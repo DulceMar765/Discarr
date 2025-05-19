@@ -1,6 +1,72 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Proyecto - {{ $project->name }} - Discarr</title>
 
-@section('content')
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: none;
+        }
+        .card-header {
+            background-color: #006666;
+            padding: 1.25rem;
+        }
+        .card-header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        .text-primary {
+            color: #006666 !important;
+        }
+        .bg-primary {
+            background-color: #006666 !important;
+        }
+        .progress {
+            height: 12px;
+            border-radius: 6px;
+        }
+        .progress-bar {
+            background-color: #006666;
+        }
+        .badge.bg-success {
+            background-color: #28a745 !important;
+        }
+        .badge.bg-warning {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+        }
+        .table th {
+            background-color: #f2f2f2;
+        }
+        .footer {
+            margin-top: 4rem;
+            padding: 1.5rem 0;
+            background-color: #f2f2f2;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
 <div class="container py-5">
     <div class="card shadow-lg border-0">
         <div class="card-header bg-primary text-white">
@@ -137,4 +203,18 @@
         </div>
     </div>
 </div>
-@endsection
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Font Awesome JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+<footer class="footer text-center">
+    <div class="container">
+        <p>&copy; 2025 Discarr. Todos los derechos reservados.</p>
+        <a href="/" class="btn btn-outline-secondary btn-sm">Volver al sitio principal</a>
+    </div>
+</footer>
+
+</body>
+</html>
