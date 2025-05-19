@@ -38,19 +38,21 @@ class CalendarDay extends Model
     public function getCalculatedAvailableSlotsAttribute()
     {
         // Comprobar si ya hay horarios personalizados definidos
-        $customSlots = $this->attributes['available_slots'] ? json_decode($this->attributes['available_slots'], true) : null;
-        
+        $customSlots = array_key_exists('available_slots', $this->attributes) && $this->attributes['available_slots']
+            ? json_decode($this->attributes['available_slots'], true)
+            : null;
+
         // Si hay horarios personalizados, respetarlos
         if (!empty($customSlots)) {
             \Log::info("Usando horarios personalizados para la fecha {$this->date}: " . json_encode($customSlots));
             return $customSlots;
         }
-        
+
         // Si no hay horarios personalizados, calcularlos
         $allSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']; // Horarios predeterminados
         $bookedSlots = $this->appointments->pluck('time_slot')->toArray();
         $availableSlots = array_diff($allSlots, $bookedSlots); // Devuelve los horarios que no están reservados
-        
+
         \Log::info("Generando horarios calculados para la fecha {$this->date}: " . json_encode($availableSlots));
         return array_values($availableSlots);
     }

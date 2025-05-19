@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -11,7 +12,6 @@ class AdminMiddleware
         if (Auth::check() && Auth::user()->role === 'admin') {
             return $next($request);
         }
-
-        return redirect('/')->with('error', 'No tienes permiso para acceder a esta página.');
+        abort(403, 'No autorizado');
     }
 }
