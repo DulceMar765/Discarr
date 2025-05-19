@@ -475,54 +475,15 @@ class AppointmentsController extends Controller
     // Obtener datos del calendario para mostrar en la vista de disponibilidad
     public function calendarData()
     {
-        // Obtener todos los días del calendario para los próximos 90 días
-        $startDate = now()->format('Y-m-d');
-        $endDate = now()->addDays(90)->format('Y-m-d');
+        // Obtener los datos formateados usando el método compartido
+        $events = $this->getCalendarDataForResponse();
 
-        $calendarDays = CalendarDay::whereBetween('date', [$startDate, $endDate])->get();
-
-        // Formatear los datos para el calendario
-        $events = [];
-
-        foreach ($calendarDays as $day) {
-            // Determinar el color según el estado
-            $color = '';
-            $title = '';
-
-            switch ($day->availability_status) {
-                case 'green':
-                    $color = '#28a745';
-                    $title = 'Disponible';
-                    break;
-                case 'yellow':
-                    $color = '#ffc107';
-                    $title = 'Poca disponibilidad';
-                    break;
-                case 'red':
-                    $color = '#dc3545';
-                    $title = 'Sin disponibilidad';
-                    break;
-                case 'purple':
-                    $color = '#b39ddb';
-                    $title = 'Día sin servicio';
-                    break;
-                default:
-                    $color = '#adb5bd';
-                    $title = 'No configurado';
-            }
-
-            // Añadir el evento al array
-            $events[] = [
-                'title' => $title,
-                'start' => $day->date,
-                'backgroundColor' => $color,
-                'borderColor' => $color,
-                'textColor' => '#fff',
-                'allDay' => true,
-            ];
-        }
-
-        return response()->json($events);
+        // Devolver la respuesta con la misma estructura que saveAvailability()
+        return response()->json([
+            'success' => true,
+            'message' => 'Datos del calendario obtenidos correctamente',
+            'data' => $events
+        ]);
     }
 
     // Obtener la configuración de un día específico
@@ -737,25 +698,15 @@ class AppointmentsController extends Controller
 
                 DB::commit();
 
-                // Obtener datos actualizados del calendario para devolver junto con la respuesta
-                $calendarData = $this->calendarData();
+                // Obtener datos actualizados del calendario 
+                $calendarData = $this->getCalendarDataForResponse();
 
                 // Devolver respuesta exitosa con los datos actualizados del calendario
+                // Devolvemos la respuesta con la estructura que espera el frontend
                 return response()->json([
                     'success' => true,
                     'message' => 'Configuración guardada correctamente',
-                    'calendarData' => $calendarData,
-                    'updatedDate' => $request->date,
-                    'needsRefresh' => true,
-                    'debug' => [
-                        'id' => $verifyDay->id,
-                        'date' => $request->date,
-                        'status' => $request->status,
-                        'availability_status' => $verifyDay->availability_status,
-                        'manual_override' => $verifyDay->manual_override,
-                        'available_slots' => $verifyDay->getRawOriginal('available_slots'),
-                        'timestamp' => time() // Añadir timestamp para evitar caché
-                    ]
+                    'data' => $calendarData  // Los datos del calendario dentro de la propiedad data
                 ]);
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -764,9 +715,11 @@ class AppointmentsController extends Controller
                 \Log::error($e->getTraceAsString());
 
                 // Devolver respuesta de error
+                // Usar el mismo formato para errores que para éxitos, para mantener consistencia
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error al guardar la configuración: ' . $e->getMessage()
+                    'message' => 'Error al guardar la configuración: ' . $e->getMessage(),
+                    'data' => [] // Array vacío para mantener consistencia con respuestas exitosas
                 ], 500);
             }
         } catch (\Exception $e) {
@@ -874,6 +827,79 @@ class AppointmentsController extends Controller
         return [
             '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'
         ];
+    }
+
+    /**
+     * Obtiene los datos del calendario en formato JSON para la respuesta
+     * Devuelve un array estructurado para que coincida con lo que espera el frontend
+     */
+    private function getCalendarDataForResponse()
+    {
+        // Obtener todos los días del calendario para los próximos 90 días
+        $startDate = now()->format('Y-m-d');
+        $endDate = now()->addDays(90)->format('Y-m-d');
+
+        $calendarDays = CalendarDay::whereBetween('date', [$startDate, $endDate])->get();
+
+        // Formatear los datos para el calendario
+        $events = [];
+
+        foreach ($calendarDays as $day) {
+            // Determinar el color según el estado
+            $color = '';
+            $title = '';
+
+            switch ($day->availability_status) {
+                case 'green':
+                    $color = '#28a745';
+                    $title = 'Disponible';
+                    break;
+                case 'yellow':
+                    $color = '#ffc107';
+                    $title = 'Poca disponibilidad';
+                    break;
+                case 'orange':
+                    $color = '#fd7e14';
+                    $title = 'Muy poca disponibilidad';
+                    break;
+                case 'red':
+                    $color = '#dc3545';
+                    $title = 'Sin disponibilidad';
+                    break;
+                case 'black':
+                    $color = '#343a40';
+                    $title = 'Festivo / Sin servicio';
+                    break;
+                case 'purple':
+                    $color = '#b39ddb';
+                    $title = 'Día sin servicio';
+                    break;
+                default:
+                    $color = '#adb5bd';
+                    $title = 'No configurado';
+            }
+
+            // Añadir el evento al array
+            $events[] = [
+                'id' => $day->id,
+                'title' => $title,
+                'start' => $day->date,
+                'backgroundColor' => $color,
+                'borderColor' => $color,
+                'textColor' => ($day->availability_status == 'yellow' || $day->availability_status == 'orange') ? '#000' : '#fff',
+                'allDay' => true,
+                'extendedProps' => [
+                    'status' => $day->availability_status,
+                    'dayId' => $day->id,
+                    'bookedSlots' => $day->booked_slots,
+                    'totalSlots' => $day->total_slots,
+                    'availableSlots' => $day->available_slots,
+                    'manualOverride' => $day->manual_override ? true : false
+                ]
+            ];
+        }
+
+        return $events;
     }
 
     /**
