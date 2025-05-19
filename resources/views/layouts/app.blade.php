@@ -190,12 +190,16 @@
         <div class="container text-center">
             <div class="footer-links mb-3">
                 <a href="/">Inicio</a> |
-                <a href="/contacto">Contacto</a>
+                <a href="/contacto">Contacto</a> |
+                <a href="https://wa.me/5218331077911" target="_blank" rel="noopener">Chatbot</a>
             </div>
             <div class="social-links mb-3">
                 <a href="#"><i class="fab fa-facebook-f"></i></a>
                 <a href="#"><i class="fab fa-twitter"></i></a>
                 <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/5218331077911" target="_blank" rel="noopener" title="WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
             </div>
             <p class="mb-0">&copy; 2025 Discarr. Todos los derechos reservados.</p>
         </div>
