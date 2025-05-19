@@ -9,10 +9,22 @@ class Material extends Model
    protected $fillable = [
         'name',
         'description',
-        'stock',   // <-- Aquí debe estar
+        'stock',
         'unit',
         'price',
         'category_id',
         'supplier_id',
     ];
+
+    // Relación con Category (pertenece a)
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    // Relación con Supplier (pertenece a)
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 }

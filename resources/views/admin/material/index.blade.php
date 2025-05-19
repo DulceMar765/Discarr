@@ -14,9 +14,12 @@
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
+                        <th>Descripción</th> <!-- Nuevo -->
                         <th>Cantidad</th>
                         <th>Unidad</th>
                         <th>Precio</th>
+                        <th>Categoría</th> <!-- Nuevo -->
+                        <th>Proveedor</th> <!-- Nuevo -->
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -25,9 +28,12 @@
                         <tr id="row-material-{{ $material->id }}">
                             <td>{{ $material->id }}</td>
                             <td>{{ $material->name }}</td>
+                            <td>{{ $material->description ?? '—' }}</td> <!-- Nuevo -->
                             <td>{{ $material->stock }}</td>
                             <td>{{ $material->unit }}</td>
                             <td>${{ number_format($material->price, 2) }}</td>
+                            <td>{{ $material->category->name ?? 'Sin categoría' }}</td> <!-- Nuevo -->
+                            <td>{{ $material->supplier->name ?? 'Sin proveedor' }}</td> <!-- Nuevo -->
                             <td>
                                 <a href="#" onclick="loadAdminSection('{{ route('admin.material.edit', $material->id) }}'); return false;" class="btn btn-warning btn-sm">Editar</a>
                                 <button onclick="deleteMaterial({{ $material->id }});" class="btn btn-danger btn-sm">Eliminar</button>
