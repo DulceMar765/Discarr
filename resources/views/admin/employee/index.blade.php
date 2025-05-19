@@ -19,6 +19,7 @@
                         <th>Fecha de Contratación</th>
                         <th>Dirección</th>
                         <th>Estado</th>
+                        <th>En Vacaciones</th> <!-- Nueva columna -->
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -41,6 +42,13 @@
                             @endif
                         </td>
                         <td>
+                            @if($employee->on_vacation)
+                                <span class="badge bg-info">Sí</span>
+                            @else
+                                <span class="badge bg-secondary">No</span>
+                            @endif
+                        </td>
+                        <td>
                             <a href="#" onclick="loadAdminSection('{{ route('employee.edit', $employee->id) }}'); return false;" class="btn btn-warning btn-sm">Editar</a>
                             <button onclick="deleteEmployee({{ $employee->id }});" class="btn btn-danger btn-sm">Eliminar</button>
                         </td>
@@ -56,7 +64,7 @@
 function deleteEmployee(id) {
     if (!confirm('¿Estás seguro de que deseas eliminar este empleado?')) return;
 
-    fetch(/employees/${id}, {
+    fetch(`/employees/${id}`, {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
@@ -67,7 +75,7 @@ function deleteEmployee(id) {
     })
     .then(async response => {
         if (response.ok) {
-            document.getElementById(row-employee-${id}).remove();
+            document.getElementById(`row-employee-${id}`).remove();
         } else {
             const data = await response.json();
             alert(data.message || 'Error al eliminar el empleado.');

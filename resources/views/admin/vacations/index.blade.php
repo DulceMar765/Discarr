@@ -57,12 +57,14 @@ function deleteVacation(id) {
         headers: {
             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
             'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
         },
         body: new URLSearchParams({ _method: 'DELETE' })
     })
     .then(async response => {
         if (response.ok) {
-            document.getElementById(`row-vacation-${id}`).remove();
+            const row = document.getElementById(`row-vacation-${id}`);
+            if (row) row.remove();
         } else {
             const data = await response.json();
             alert(data.message || 'Error al eliminar la vacación.');
@@ -74,3 +76,4 @@ function deleteVacation(id) {
     });
 }
 </script>
+

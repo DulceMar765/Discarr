@@ -15,10 +15,10 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+   public function index()
 {
     $employees = Employee::all()->map(function ($employee) {
-        $employee->on_vacation = $employee->isOnVacation(); // Aquí añadimos el atributo dinámico
+        $employee->on_vacation = $employee->isOnVacation(); // Esto devuelve true o false
         return $employee;
     });
 
@@ -28,6 +28,7 @@ class EmployeeController extends Controller
 
     return view('admin.employee.index', compact('employees'));
 }
+
 
 
     /**
