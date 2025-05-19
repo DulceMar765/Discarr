@@ -265,17 +265,17 @@ Route::get('/servicios/renta-oficinas-moviles', function () {
 // Rutas de autenticación de Laravel
 require __DIR__.'/auth.php';
 
-// Solo admin puede acceder a la lista, editar, eliminar, ver citas
-Route::middleware(['auth', 'admin'])->group(function () {
+// Clientes autenticados pueden crear y guardar citas
+Route::middleware(['auth'])->group(function () {
+    Route::get('/appointments/create', [AppointmentsController::class, 'create'])->name('appointments.create');
+    Route::post('/appointments', [AppointmentsController::class, 'store'])->name('appointments.store');
+});
+
+// Solo admin (o lógica en el controlador) puede acceder a la lista y gestión de citas
+Route::middleware(['auth'])->group(function () {
     Route::get('/appointments', [AppointmentsController::class, 'index'])->name('appointments.index');
     Route::get('/appointments/{appointment}/edit', [AppointmentsController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{appointment}', [AppointmentsController::class, 'update'])->name('appointments.update');
     Route::delete('/appointments/{appointment}', [AppointmentsController::class, 'destroy'])->name('appointments.destroy');
     Route::get('/appointments/{appointment}', [AppointmentsController::class, 'show'])->name('appointments.show');
-});
-
-// Las rutas para crear y guardar citas siguen abiertas para clientes autenticados
-Route::middleware(['auth'])->group(function () {
-    Route::get('/appointments/create', [AppointmentsController::class, 'create'])->name('appointments.create');
-    Route::post('/appointments', [AppointmentsController::class, 'store'])->name('appointments.store');
 });

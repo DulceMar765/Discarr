@@ -16,6 +16,11 @@ class AppointmentsController extends Controller
     // Mostrar todas las citas
     public function index()
     {
+        // Solo permitir admins
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'No autorizado');
+        }
+
         // Obtén todas las citas con las relaciones necesarias
         $appointments = Appointment::with(['user', 'calendarDay'])->orderBy('created_at', 'desc')->get();
 
