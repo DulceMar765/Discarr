@@ -1,10 +1,126 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Estado del Proyecto - {{ $project->name }} - Discarr</title>
 
-@section('content')
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 6px 30px rgba(0,0,0,0.1);
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .card-header {
+            background-color: #006666;
+            padding: 1.5rem;
+            border-bottom: none;
+        }
+        .card-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+        .text-primary {
+            color: #006666 !important;
+        }
+        .bg-primary {
+            background-color: #006666 !important;
+        }
+        .btn-primary {
+            background-color: #006666;
+            border-color: #006666;
+        }
+        .btn-primary:hover {
+            background-color: #004c4c;
+            border-color: #004c4c;
+        }
+        .progress {
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: #e9ecef;
+        }
+        .progress-bar {
+            background-color: #006666;
+            transition: width 1.5s ease;
+        }
+        .badge.bg-success {
+            background-color: #28a745 !important;
+        }
+        .badge.bg-primary {
+            background-color: #006666 !important;
+        }
+        .footer {
+            padding: 2rem 0;
+            margin-top: 3rem;
+            background-color: #f1f1f1;
+        }
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+            padding: 1rem 1.25rem;
+        }
+        /* Animaciones sutiles */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        .badge.bg-warning {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+        }
+        .table th {
+            background-color: #f2f2f2;
+        }
+        .footer {
+            margin-top: 4rem;
+            padding: 1.5rem 0;
+            background-color: #f2f2f2;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
 <div class="container py-5">
-    <div class="card shadow-lg border-0">
+    <div class="card shadow-lg border-0 fade-in">
         <div class="card-header bg-primary text-white">
-            <h1 class="mb-0">Estado del Proyecto</h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0"><i class="fas fa-chart-line me-2"></i>Estado del Proyecto</h1>
+                <span class="badge {{ $project->status == 'completado' ? 'bg-success' : ($project->status == 'en_progreso' ? 'bg-warning' : 'bg-secondary') }} p-2">
+                    <i class="fas fa-circle me-1 small"></i> {{ ucfirst(str_replace('_', ' ', $project->status)) }}
+                </span>
+            </div>
         </div>
         <div class="card-body">
             <div class="row mb-4">
@@ -12,34 +128,65 @@
                     <h2 class="text-primary">{{ $project->name }}</h2>
                     <p class="text-muted">{{ $project->description }}</p>
 
-                    <div class="d-flex align-items-center mb-3">
-                        <span class="badge {{ $project->status == 'completado' ? 'bg-success' : ($project->status == 'en_progreso' ? 'bg-warning' : 'bg-secondary') }} me-2">
-                            {{ ucfirst(str_replace('_', ' ', $project->status)) }}
-                        </span>
-                        <div class="progress flex-grow-1" style="height: 10px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ $progreso }}%;" aria-valuenow="{{ $progreso }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="card mb-4">
+                        <div class="card-body p-4">
+                            <h4 class="text-primary mb-3"><i class="fas fa-tasks me-2"></i>Progreso del Proyecto</h4>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="progress flex-grow-1" style="height: 15px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ $progreso }}%;" 
+                                         aria-valuenow="{{ $progreso }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <span class="ms-3 fw-bold fs-5">{{ $progreso }}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Inicio: {{ $project->start_date ? $project->start_date->format('d/m/Y') : 'No definida' }}</span>
+                                <span class="text-muted">Fin estimado: {{ $project->end_date ? $project->end_date->format('d/m/Y') : 'No definida' }}</span>
+                            </div>
                         </div>
-                        <span class="ms-2">{{ $progreso }}%</span>
                     </div>
 
                     <div class="row mt-4">
                         <div class="col-md-6">
-                            <div class="card bg-light mb-3">
+                            <div class="card mb-3 h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="m-0"><i class="fas fa-calendar-alt me-2 text-primary"></i>Tiempo del Proyecto</h5>
+                                </div>
                                 <div class="card-body">
-                                    <h5 class="card-title">Fechas</h5>
-                                    <p class="mb-1"><strong>Inicio:</strong> {{ $project->start_date ? $project->start_date->format('d/m/Y') : 'No definida' }}</p>
-                                    <p class="mb-1"><strong>Fin estimado:</strong> {{ $project->end_date ? $project->end_date->format('d/m/Y') : 'No definida' }}</p>
-                                    <p class="mb-0"><strong>Días trabajados:</strong> {{ $diasTrabajados }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-muted">Días trabajados:</span>
+                                        <span class="badge bg-primary rounded-pill p-2 px-3">{{ $diasTrabajados }} días</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Duración del proyecto:</span>
+                                        <span class="badge bg-light text-dark rounded-pill p-2 px-3 border">
+                                            {{ $project->start_date && $project->end_date ? $project->start_date->diffInDays($project->end_date) : '?' }} días planificados
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card bg-light mb-3">
+                            <div class="card mb-3 h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="m-0"><i class="fas fa-money-bill-wave me-2 text-primary"></i>Recursos Utilizados</h5>
+                                </div>
                                 <div class="card-body">
-                                    <h5 class="card-title">Recursos</h5>
-                                    <p class="mb-1"><strong>Horas totales:</strong> {{ $horasTotales }}</p>
-                                    <p class="mb-1"><strong>Costo materiales:</strong> ${{ number_format($costoMateriales, 2) }}</p>
-                                    <p class="mb-0"><strong>Presupuesto:</strong> ${{ number_format($project->budget ?? 0, 2) }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span><i class="far fa-clock me-2"></i>Horas totales:</span>
+                                        <span class="fw-bold">{{ $horasTotales }} horas</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span><i class="fas fa-tools me-2"></i>Costo materiales:</span>
+                                        <span class="fw-bold">${{ number_format($costoMateriales, 2) }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-chart-pie me-2"></i>Presupuesto:</span>
+                                        <span class="fw-bold">${{ number_format($project->budget ?? 0, 2) }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -137,4 +284,41 @@
         </div>
     </div>
 </div>
-@endsection
+
+<!-- jQuery (necesario para algunos componentes de Bootstrap) -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+<!-- Script para inicializar los tooltips de Bootstrap -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar todos los tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Configurar el token CSRF para solicitudes AJAX
+        if (typeof $ !== 'undefined') { // Verificar si jQuery está disponible
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+        }
+        
+        console.log('Scripts inicializados correctamente');
+    });
+</script>
+
+<footer class="footer text-center">
+    <div class="container">
+        <p>&copy; 2025 Discarr. Todos los derechos reservados.</p>
+        <a href="/" class="btn btn-outline-secondary btn-sm">Volver al sitio principal</a>
+    </div>
+</footer>
+
+</body>
+</html>

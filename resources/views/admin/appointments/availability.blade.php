@@ -396,31 +396,37 @@
                         alert('Configuración guardada correctamente');
                     }
                     
-                    // Recargar completamente el calendario con datos frescos
-                    if (data.calendarData) {
+                    // Verificar si tenemos datos de calendario en la respuesta
+                    if (data.data && Array.isArray(data.data)) {
                         console.log('Usando datos del calendario actualizados del servidor');
                         // Eliminar todos los eventos actuales
                         calendar.removeAllEvents();
                         
                         // Añadir los eventos con los datos actualizados
-                        data.calendarData.forEach(day => {
-                            const eventColor = getEventColor(day.availability_status);
-                            const selectable = day.availability_status !== 'black' && day.availability_status !== 'red';
+                        data.data.forEach(event => {
+                            // Extraer información del evento
+                            const title = event.title || 'Sin título';
+                            const start = event.start;
+                            const backgroundColor = event.backgroundColor || '#adb5bd';
+                            const borderColor = event.borderColor || backgroundColor;
+                            
+                            // Si hay propiedades extendidas en el evento, las usamos
+                            const extendedProps = event.extendedProps || {};
+                            // Determinamos si el evento es seleccionable basado en el color
+                            const isRed = backgroundColor === '#dc3545';
+                            const isBlack = backgroundColor === '#343a40';
+                            const selectable = !isRed && !isBlack;
                             
                             calendar.addEvent({
-                                title: getEventTitle(day),
-                                start: day.date,
+                                title: title,
+                                start: start,
                                 allDay: true,
-                                backgroundColor: eventColor,
-                                borderColor: eventColor,
-                                extendedProps: {
-                                    dayId: day.id,
-                                    status: day.availability_status,
-                                    availableSlots: day.available_slots,
-                                    manualOverride: day.manual_override
-                                },
+                                backgroundColor: backgroundColor,
+                                borderColor: borderColor,
+                                textColor: event.textColor || '#fff',
+                                extendedProps: extendedProps,
                                 selectable: selectable,
-                                classNames: day.availability_status === 'black' ? ['holiday-event'] : []
+                                classNames: isBlack ? ['holiday-event'] : []
                             });
                         });
                     } else {
@@ -454,31 +460,51 @@
         
         // Función para actualizar las estadísticas
         function updateStatistics() {
+            console.log('Actualizando estadísticas...');
             fetch('/admin/appointments/calendar-data')
                 .then(response => response.json())
-                .then(data => {
+                .then(response => {
+                    console.log('Respuesta recibida:', response);
+                    
+                    // Extraer los datos de la respuesta (pueden venir directamente o dentro de una propiedad data)
+                    const data = Array.isArray(response) ? response : (response.data || []);
+                    console.log('Datos a procesar:', data);
+                    
+                    // Verificar que data sea un array
+                    if (!Array.isArray(data)) {
+                        console.error('Los datos procesados no son un array:', data);
+                        return;
+                    }
+                    
                     // Contar días por estado
                     let availableDays = 0;
                     let busyDays = 0;
                     let totalSlots = 0;
                     
                     data.forEach(event => {
-                        if (event.color === '#28a745') { // Verde - disponible
+                        // Usar backgroundColor si está disponible, de lo contrario intentar con color
+                        const eventColor = event.backgroundColor || event.color || '';
+                        
+                        if (eventColor === '#28a745') { // Verde - disponible
                             availableDays++;
-                        } else if (event.color === '#dc3545' || event.color === '#ffc107') { // Rojo o amarillo - ocupado
+                        } else if (eventColor === '#dc3545' || eventColor === '#ffc107') { // Rojo o amarillo - ocupado
                             busyDays++;
                         }
                         
                         // Contar slots si están disponibles en los datos
                         if (event.slots) {
-                            totalSlots += event.slots.length;
+                            totalSlots += Array.isArray(event.slots) ? event.slots.length : 0;
                         }
                     });
                     
                     // Actualizar contadores
-                    document.getElementById('availableDaysCount').textContent = availableDays;
-                    document.getElementById('busyDaysCount').textContent = busyDays;
-                    document.getElementById('totalSlotsCount').textContent = totalSlots;
+                    const availableDaysElement = document.getElementById('availableDaysCount');
+                    const busyDaysElement = document.getElementById('busyDaysCount');
+                    const totalSlotsElement = document.getElementById('totalSlotsCount');
+                    
+                    if (availableDaysElement) availableDaysElement.textContent = availableDays;
+                    if (busyDaysElement) busyDaysElement.textContent = busyDays;
+                    if (totalSlotsElement) totalSlotsElement.textContent = totalSlots;
                 })
                 .catch(error => {
                     console.error('Error al cargar estadísticas:', error);
