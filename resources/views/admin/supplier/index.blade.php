@@ -12,8 +12,13 @@
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
+                        <th>Contacto</th>
                         <th>Email</th>
                         <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th>Sitio Web</th>
+                        <th>Prioridad</th>
+                        <th>Confiabilidad</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -22,8 +27,19 @@
                     <tr id="row-supplier-{{ $supplier->id }}">
                         <td>{{ $supplier->id }}</td>
                         <td>{{ $supplier->name }}</td>
-                        <td>{{ $supplier->email }}</td>
-                        <td>{{ $supplier->phone }}</td>
+                        <td>{{ $supplier->contact_name ?? '-' }}</td>
+                        <td>{{ $supplier->email ?? '-' }}</td>
+                        <td>{{ $supplier->phone_number ?? '-' }}</td>
+                        <td>{{ $supplier->address ?? '-' }}</td>
+                        <td>
+                            @if($supplier->website)
+                                <a href="{{ $supplier->website }}" target="_blank">{{ $supplier->website }}</a>
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td>{{ $supplier->priority }}</td>
+                        <td>{{ $supplier->reliability_score ?? '-' }}%</td>
                         <td>
                             <a href="#" onclick="loadAdminSection('{{ route('supplier.edit', $supplier->id) }}'); return false;" class="btn btn-warning btn-sm">Editar</a>
                             <button onclick="deleteSupplier({{ $supplier->id }});" class="btn btn-danger btn-sm">Eliminar</button>
@@ -37,31 +53,31 @@
 </div>
 
 <script>
-// Función para eliminar un proveedor
 function deleteSupplier(id) {
     if (!confirm('¿Estás seguro de que deseas eliminar este proveedor?')) return;
 
-    fetch(`/supplier/${id}`, { // <- corregido
+    fetch(/supplier/${id}, {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
             'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({ _method: 'DELETE' })
     })
-    .then(async response => {
-        if (response.ok) {
-            document.getElementById(`row-supplier-${id}`).remove();
-        } else {
-            const data = await response.json();
-            alert(data.message || 'Error al eliminar el proveedor.');
+    .then(response => response.json())
+    .then(data => {
+        if (data.html) {
+            document.querySelector('.admin-section').innerHTML = data.html;
+        }
+
+        if (data.message) {
+            alert(data.message);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Fallo al eliminar el proveedor.');
+        console.error('Error al eliminar:', error);
+        alert('Ocurrió un error al intentar eliminar el proveedor.');
     });
 }
-
 </script>
-

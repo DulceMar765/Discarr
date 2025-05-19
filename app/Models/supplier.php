@@ -6,7 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Supplier extends Model
 {
-    protected $fillable = [
-        'name', 'contact', 'email', 'phone', 'address'
-    ];
+    // App\Models\Supplier.php
+protected $fillable = [
+    'name',
+    'contact_name',
+    'email',
+    'phone_number',
+    'address',
+    'website',
+    'priority',
+    'reliability_score'
+];
+
 }
