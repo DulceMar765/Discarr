@@ -908,4 +908,6 @@ class AppointmentsController extends Controller
             'appointment' => $appointment
         ]);
     }
+
+
 }

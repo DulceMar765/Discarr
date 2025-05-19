@@ -4,7 +4,7 @@
 <section class="hero position-relative">
     <style>
         .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{{ asset("img/hero-bg.jpg") }}') no-repeat center center;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)), url('{{ asset('img/herreria-diseno.jpg') }}') no-repeat center center;
             background-size: cover;
             height: 80vh;
             display: flex;
